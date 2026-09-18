@@ -504,22 +504,22 @@ body {
 }
 
 .tx-icon-badge {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  background: transparent;
+  color: #ffffff;
   transition: transform 0.2s var(--ios-spring);
 }
 
 .tx-icon-badge svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
 }
 
 .tx-info {
@@ -904,18 +904,19 @@ body {
 }
 
 .cat-picker-icon-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 2px;
+  color: #ffffff;
 }
 
 .cat-picker-icon-badge svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
 }
 
 .cat-picker-name {
