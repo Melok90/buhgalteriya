@@ -305,8 +305,10 @@ function groupTransactionsByDate(txList) {
     transactionsListEl.innerHTML = dateGroups.map(group => {
       const itemsHtml = group.items.map(tx => {
         const cat = CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1];
-        const percent = totalSpent > 0 ? Math.round((tx.amount / totalSpent) * 100) : 0;
-        const barWidth = percent < 4 ? 4 : percent;
+        const metaParts = [];
+        if (tx.place) metaParts.push(escapeHtml(tx.place));
+        if (cat && cat.name && cat.id !== 'all') metaParts.push(cat.name);
+        const subtitle = metaParts.join(' · ');
 
         return `
           <div class="tx-swipe-wrapper" data-tx-wrapper="${tx.id}">
@@ -332,21 +334,12 @@ function groupTransactionsByDate(txList) {
               </div>
               
               <div class="tx-info">
-                <div class="tx-row-top">
-                  <span class="tx-title">${escapeHtml(tx.comment)}</span>
-                  ${tx.place ? `<span class="tx-place-badge">${escapeHtml(tx.place)}</span>` : ''}
-                </div>
-                <div class="progress-track">
-                  <div 
-                    class="progress-fill" 
-                    style="width: ${barWidth}%; background-color: ${cat.hex};"
-                  ></div>
-                </div>
+                <span class="tx-title">${escapeHtml(tx.comment)}</span>
+                ${subtitle ? `<span class="tx-subtitle">${subtitle}</span>` : ''}
               </div>
 
               <div class="tx-amount-col">
                 <span class="tx-amount num-tabular">${formatRub(tx.amount)}</span>
-                <span class="tx-percent num-tabular">${percent}%</span>
               </div>
 
               <div class="tx-chevron-indicator">
