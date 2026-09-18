@@ -427,14 +427,44 @@ body {
   color: var(--ios-label-tertiary);
 }
 
-/* ==========================================================================
-   Transactions List (iOS Inset Grouped Style with Swipe-to-Delete)
-   ========================================================================== */
 .transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.date-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 4px;
+}
+
+.date-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ios-label-secondary);
+}
+
+.date-group-total {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-label-tertiary);
+}
+
+.date-group-card {
   background-color: var(--ios-bg-secondary);
   border-radius: var(--ios-radius-card);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 /* Container for each swipable row */
@@ -824,6 +854,12 @@ body {
 .form-inputs-stack {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.form-row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 

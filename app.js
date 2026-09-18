@@ -148,6 +148,7 @@ const addFormEl = document.getElementById('add-form');
 const amountInputEl = document.getElementById('amount-input');
 const commentInputEl = document.getElementById('comment-input');
 const placeInputEl = document.getElementById('place-input');
+const dateInputEl = document.getElementById('date-input');
 const catPickerContainerEl = document.getElementById('category-picker');
 const resetBtnEl = document.getElementById('reset-btn');
 
@@ -239,6 +240,58 @@ function renderApp() {
     return matchesCat && matchesText;
   });
 
+// --- 5.1 Вспомогательные функции для дат и группировки ---
+function getDateKey(dateInput) {
+  if (!dateInput) return 'unknown';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return 'unknown';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatGroupDateTitle(dateKey) {
+  if (dateKey === 'unknown') return 'Ранее';
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const txDate = new Date(y, m - 1, d);
+  
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(y, m - 1, d);
+  const diffDays = Math.round((today - target) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Сегодня';
+  if (diffDays === 1) return 'Вчера';
+
+  const options = { day: 'numeric', month: 'long' };
+  if (y !== now.getFullYear()) {
+    options.year = 'numeric';
+  }
+  return txDate.toLocaleDateString('ru-RU', options);
+}
+
+function groupTransactionsByDate(txList) {
+  const groups = new Map();
+
+  txList.forEach(tx => {
+    const key = getDateKey(tx.date);
+    if (!groups.has(key)) {
+      groups.set(key, {
+        dateKey: key,
+        title: formatGroupDateTitle(key),
+        total: 0,
+        items: []
+      });
+    }
+    const group = groups.get(key);
+    group.items.push(tx);
+    group.total += tx.amount;
+  });
+
+  return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+}
+
   txCountBadgeEl.textContent = `${filtered.length} ${getNounPlural(filtered.length, 'запись', 'записи', 'записей')}`;
 
   if (filtered.length === 0) {
@@ -247,59 +300,75 @@ function renderApp() {
   } else {
     emptyStateEl.classList.remove('hidden');
     emptyStateEl.classList.add('hidden');
-    transactionsListEl.innerHTML = filtered.map(tx => {
-      const cat = CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1];
-      const percent = totalSpent > 0 ? Math.round((tx.amount / totalSpent) * 100) : 0;
-      const barWidth = percent < 4 ? 4 : percent;
+    const dateGroups = groupTransactionsByDate(filtered);
 
-      return `
-        <div class="tx-swipe-wrapper" data-tx-wrapper="${tx.id}">
-          <!-- Underlying Red Action Button for Swipe-to-Delete -->
-          <button 
-            type="button" 
-            data-action="delete" 
-            data-id="${tx.id}" 
-            class="tx-delete-action"
-            title="Удалить запись"
-            aria-label="Удалить расход ${escapeHtml(tx.comment)}"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            <span>Удалить</span>
-          </button>
+    transactionsListEl.innerHTML = dateGroups.map(group => {
+      const itemsHtml = group.items.map(tx => {
+        const cat = CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1];
+        const percent = totalSpent > 0 ? Math.round((tx.amount / totalSpent) * 100) : 0;
+        const barWidth = percent < 4 ? 4 : percent;
 
-          <!-- Front Swipe Row -->
-          <div class="tx-item" data-tx-row="${tx.id}">
-            <div class="tx-icon-badge">
-              ${cat.icon}
-            </div>
-            
-            <div class="tx-info">
-              <div class="tx-row-top">
-                <span class="tx-title">${escapeHtml(tx.comment)}</span>
-                ${tx.place ? `<span class="tx-place-badge">${escapeHtml(tx.place)}</span>` : ''}
-              </div>
-              <div class="progress-track">
-                <div 
-                  class="progress-fill" 
-                  style="width: ${barWidth}%; background-color: ${cat.hex};"
-                ></div>
-              </div>
-            </div>
-
-            <div class="tx-amount-col">
-              <span class="tx-amount num-tabular">${formatRub(tx.amount)}</span>
-              <span class="tx-percent num-tabular">${percent}%</span>
-            </div>
-
-            <div class="tx-chevron-indicator">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        return `
+          <div class="tx-swipe-wrapper" data-tx-wrapper="${tx.id}">
+            <!-- Underlying Red Action Button for Swipe-to-Delete -->
+            <button 
+              type="button" 
+              data-action="delete" 
+              data-id="${tx.id}" 
+              class="tx-delete-action"
+              title="Удалить запись"
+              aria-label="Удалить расход ${escapeHtml(tx.comment)}"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
               </svg>
+              <span>Удалить</span>
+            </button>
+
+            <!-- Front Swipe Row -->
+            <div class="tx-item" data-tx-row="${tx.id}">
+              <div class="tx-icon-badge">
+                ${cat.icon}
+              </div>
+              
+              <div class="tx-info">
+                <div class="tx-row-top">
+                  <span class="tx-title">${escapeHtml(tx.comment)}</span>
+                  ${tx.place ? `<span class="tx-place-badge">${escapeHtml(tx.place)}</span>` : ''}
+                </div>
+                <div class="progress-track">
+                  <div 
+                    class="progress-fill" 
+                    style="width: ${barWidth}%; background-color: ${cat.hex};"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="tx-amount-col">
+                <span class="tx-amount num-tabular">${formatRub(tx.amount)}</span>
+                <span class="tx-percent num-tabular">${percent}%</span>
+              </div>
+
+              <div class="tx-chevron-indicator">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
+        `;
+      }).join('');
+
+      return `
+        <section class="date-group-section" aria-label="${group.title}">
+          <div class="date-group-header">
+            <span class="date-group-title">${group.title}</span>
+            <span class="date-group-total num-tabular">−${formatRub(group.total)}</span>
+          </div>
+          <div class="date-group-card">
+            ${itemsHtml}
+          </div>
+        </section>
       `;
     }).join('');
 
@@ -398,6 +467,9 @@ function openBottomSheet() {
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
   bottomSheetEl.style.transform = '';
+  if (dateInputEl) {
+    dateInputEl.value = new Date().toISOString().split('T')[0];
+  }
   renderCategoryPicker();
   setTimeout(() => amountInputEl.focus(), 200);
 }
@@ -416,6 +488,7 @@ function closeBottomSheet() {
     amountInputEl.value = '';
     commentInputEl.value = '';
     placeInputEl.value = '';
+    if (dateInputEl) dateInputEl.value = '';
   }, 250);
 }
 
@@ -507,6 +580,9 @@ function setupEventListeners() {
 
     const comment = commentInputEl.value.trim() || 'Расход';
     const place = placeInputEl.value.trim() || '';
+    const dateVal = dateInputEl && dateInputEl.value 
+      ? new Date(dateInputEl.value).toISOString() 
+      : new Date().toISOString();
 
     const newTx = {
       id: Date.now(),
@@ -514,7 +590,7 @@ function setupEventListeners() {
       amount: amountNum,
       comment: comment,
       place: place,
-      date: new Date().toISOString()
+      date: dateVal
     };
 
     state.transactions.unshift(newTx);
