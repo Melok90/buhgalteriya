@@ -252,30 +252,33 @@ body {
 .categories-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   padding-bottom: 2px;
 }
 
 .chip {
-  background-color: var(--ios-fill-tertiary);
+  background-color: rgba(255, 255, 255, 0.07);
   color: var(--ios-label-secondary);
-  border: 0.5px solid rgba(255, 255, 255, 0.06);
-  padding: 0 15px;
-  min-height: 44px;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  padding: 0 11px;
+  min-height: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--ios-radius-chip);
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.22s var(--ios-spring);
+  transition: all 0.18s ease;
   white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .chip:hover {
-  background-color: var(--ios-fill);
+  background-color: rgba(255, 255, 255, 0.12);
   color: var(--ios-label);
 }
 
@@ -283,11 +286,12 @@ body {
   background-color: var(--ios-accent);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 4px 14px var(--ios-accent-glow);
+  font-weight: 600;
+  box-shadow: 0 2px 8px var(--ios-accent-glow);
 }
 
 .chip:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 /* ==========================================================================
