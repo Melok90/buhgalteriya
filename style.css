@@ -97,6 +97,8 @@ body {
   max-width: 430px;
   min-height: 100vh;
   min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   background-color: var(--ios-bg-primary);
   display: flex;
   flex-direction: column;
@@ -786,11 +788,20 @@ body {
   border-top-left-radius: var(--ios-radius-sheet);
   border-top-right-radius: var(--ios-radius-sheet);
   border-top: 0.5px solid rgba(255, 255, 255, 0.15);
-  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 24px) 20px;
+  padding: 8px 18px calc(env(safe-area-inset-bottom, 0px) + 16px) 18px;
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8);
   animation: iosSheetSlideUp 0.35s var(--ios-spring) forwards;
-  touch-action: none;
+  max-height: 94vh;
+  max-height: 94dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   transition: transform 0.25s var(--ios-spring);
+}
+
+.bottom-sheet::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes iosSheetSlideUp {
@@ -801,7 +812,7 @@ body {
 /* Drag Handle with generous touch area */
 .sheet-handle-wrapper {
   width: 100%;
-  padding: 6px 0 14px 0;
+  padding: 4px 0 8px 0;
   display: flex;
   justify-content: center;
   cursor: grab;
@@ -819,7 +830,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .sheet-title {
@@ -865,7 +876,7 @@ body {
 .numpad-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* Large Display */
@@ -878,6 +889,8 @@ body {
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
+}
+
 .numpad-amount-value {
   font-size: 52px;
   font-weight: 800;
@@ -980,7 +993,7 @@ body {
 .touch-numpad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
   max-width: 360px;
   margin: 0 auto;
   width: 100%;
@@ -991,10 +1004,10 @@ body {
   border: 0.5px solid rgba(255, 255, 255, 0.06);
   color: var(--ios-label);
   font-family: inherit;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  height: 52px;
-  border-radius: 14px;
+  height: clamp(44px, 5.8vh, 50px);
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1034,7 +1047,7 @@ body {
   font-family: inherit;
   font-size: 16px;
   font-weight: 700;
-  min-height: 50px;
+  min-height: 48px;
   border-radius: var(--ios-radius-btn);
   border: none;
   cursor: pointer;

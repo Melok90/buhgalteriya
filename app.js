@@ -1013,7 +1013,7 @@ function setupEventListeners() {
     }
 
     const isIncome = state.sheetType === 'income';
-    const catList = isIncome ? INCOME_CATEGORIES : CATEGORIES;
+    const catList = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
     const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
     const selectedCat = catList.find(c => c.id === catId) || catList[0];
 
