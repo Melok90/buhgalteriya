@@ -138,7 +138,9 @@ let state = {
   selectedIncomeCatForNew: 'salary',
   isPrivate: localStorage.getItem(PRIVACY_KEY) === 'true',
   sheetType: 'expense',
-  numpadBuffer: '0'
+  numpadBuffer: '0',
+  editingTxId: null,
+  recentTxId: null
 };
 
 function loadState() {
@@ -232,7 +234,15 @@ const sheetCommentInputEl = document.getElementById('sheet-comment-input');
 const sheetCommentClearBtnEl = document.getElementById('sheet-comment-clear-btn');
 const calculatorKeypadEl = document.querySelector('.calculator-keypad');
 const submitBtnEl = document.getElementById('submit-btn');
+const sheetDeleteTxBtnEl = document.getElementById('sheet-delete-tx-btn');
 const resetBtnEl = document.getElementById('reset-btn');
+
+// Action Toast (Отмена / Редактирование последней операции)
+const actionToastEl = document.getElementById('action-toast');
+const toastTextEl = document.getElementById('toast-text');
+const toastEditBtnEl = document.getElementById('toast-edit-btn');
+const toastUndoBtnEl = document.getElementById('toast-undo-btn');
+const toastCloseBtnEl = document.getElementById('toast-close-btn');
 
 // Category Picker Modal Sheet
 const categoryPickerBackdropEl = document.getElementById('category-picker-backdrop');
@@ -309,12 +319,18 @@ function updateNumpadDisplay() {
 
   if (submitBtnEl) {
     submitBtnEl.disabled = amountNum <= 0;
-    if (amountNum > 0) {
-      submitBtnEl.textContent = isIncome
-        ? `Пополнить · ${formatRub(amountNum)}`
-        : `Добавить расход · ${formatRub(amountNum)}`;
+    if (state.editingTxId) {
+      submitBtnEl.textContent = amountNum > 0
+        ? `Сохранить изменения · ${formatRub(amountNum)}`
+        : 'Сохранить изменения';
     } else {
-      submitBtnEl.textContent = isIncome ? 'Пополнить баланс' : 'Добавить расход';
+      if (amountNum > 0) {
+        submitBtnEl.textContent = isIncome
+          ? `Пополнить · ${formatRub(amountNum)}`
+          : `Добавить расход · ${formatRub(amountNum)}`;
+      } else {
+        submitBtnEl.textContent = isIncome ? 'Пополнить баланс' : 'Добавить расход';
+      }
     }
   }
 }
@@ -743,6 +759,8 @@ function attachSwipeListeners() {
     let isSwiping = false;
     let isHorizontalGesture = null;
 
+    let hasSwiped = false;
+
     row.addEventListener('touchstart', (e) => {
       // Закрываем любую другую открытую строку
       if (activeSwipedRow && activeSwipedRow !== row) {
@@ -753,6 +771,7 @@ function attachSwipeListeners() {
       currentX = startX;
       isSwiping = true;
       isHorizontalGesture = null;
+      hasSwiped = false;
       row.style.transition = 'none';
     }, { passive: true });
 
@@ -796,6 +815,10 @@ function attachSwipeListeners() {
       if (!isSwiping) return;
       isSwiping = false;
       const diffX = currentX - startX;
+      if (Math.abs(diffX) > 10) {
+        hasSwiped = true;
+        setTimeout(() => { hasSwiped = false; }, 250);
+      }
       row.style.transition = 'transform 0.25s var(--ios-spring)';
 
       if (diffX < -32) {
@@ -812,11 +835,20 @@ function attachSwipeListeners() {
       }
     });
 
-    // Клик по строке: если открыта — закрываем
+    // Клик по строке: если открыта — закрываем, иначе открываем на редактирование!
     row.addEventListener('click', (e) => {
+      if (hasSwiped) {
+        e.stopPropagation();
+        return;
+      }
       if (row.dataset.open === 'true') {
         e.stopPropagation();
         closeSwipedRow(row);
+      } else {
+        const txId = row.dataset.txRow;
+        if (txId) {
+          openEditSheet(txId);
+        }
       }
     });
   });
@@ -867,12 +899,51 @@ function setSheetType(type) {
 
 function openBottomSheet(type = 'expense') {
   triggerHaptic('medium');
+  state.editingTxId = null;
+  if (sheetDeleteTxBtnEl) sheetDeleteTxBtnEl.classList.add('hidden');
   state.numpadBuffer = '0';
   if (sheetCommentInputEl) {
     sheetCommentInputEl.value = '';
     if (sheetCommentClearBtnEl) sheetCommentClearBtnEl.classList.add('hidden');
   }
   setSheetType(type);
+  sheetBackdropEl.classList.remove('hidden');
+  bottomSheetEl.classList.remove('hidden');
+  bottomSheetEl.style.transform = '';
+  updateNumpadDisplay();
+}
+
+function openEditSheet(txId) {
+  const idNum = Number(txId);
+  const tx = state.transactions.find(t => t.id === idNum || t.id === txId);
+  if (!tx) return;
+
+  triggerHaptic('medium');
+  state.editingTxId = tx.id;
+  state.numpadBuffer = String(tx.amount);
+
+  if (tx.type === 'income') {
+    state.selectedIncomeCatForNew = tx.categoryId || 'salary';
+  } else {
+    state.selectedCatForNew = tx.categoryId || 'food';
+  }
+
+  setSheetType(tx.type);
+
+  if (sheetCommentInputEl) {
+    const catList = tx.type === 'income' ? INCOME_CATEGORIES : CATEGORIES;
+    const cat = catList.find(c => c.id === tx.categoryId);
+    sheetCommentInputEl.value = (tx.comment && (!cat || tx.comment !== cat.name)) ? tx.comment : '';
+    if (sheetCommentClearBtnEl) {
+      if (sheetCommentInputEl.value) sheetCommentClearBtnEl.classList.remove('hidden');
+      else sheetCommentClearBtnEl.classList.add('hidden');
+    }
+  }
+
+  if (sheetDeleteTxBtnEl) {
+    sheetDeleteTxBtnEl.classList.remove('hidden');
+  }
+
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
   bottomSheetEl.style.transform = '';
@@ -891,6 +962,8 @@ function closeBottomSheet() {
     bottomSheetEl.classList.add('hidden');
     bottomSheetEl.style.transform = '';
     sheetBackdropEl.style.opacity = '';
+    state.editingTxId = null;
+    if (sheetDeleteTxBtnEl) sheetDeleteTxBtnEl.classList.add('hidden');
     state.numpadBuffer = '0';
     if (sheetCommentInputEl) {
       sheetCommentInputEl.value = '';
@@ -898,6 +971,42 @@ function closeBottomSheet() {
       sheetCommentInputEl.blur();
     }
     updateNumpadDisplay();
+  }, 250);
+}
+
+// --- Уведомление о действии (Action Toast: Отменить / Изменить) ---
+let toastTimeout = null;
+
+function showActionToast(tx, mode = 'created') {
+  if (!actionToastEl) return;
+  clearTimeout(toastTimeout);
+
+  state.recentTxId = tx.id;
+  const isIncome = tx.type === 'income';
+  const typeText = isIncome ? 'Пополнение' : 'Расход';
+  const amountFormatted = formatRub(tx.amount);
+
+  if (toastTextEl) {
+    toastTextEl.textContent = mode === 'edited'
+      ? `Изменения сохранены · ${amountFormatted}`
+      : `${typeText} ${amountFormatted} добавлен`;
+  }
+
+  actionToastEl.classList.remove('hiding');
+  actionToastEl.classList.remove('hidden');
+
+  toastTimeout = setTimeout(() => {
+    hideActionToast();
+  }, 5500);
+}
+
+function hideActionToast() {
+  if (!actionToastEl || actionToastEl.classList.contains('hidden')) return;
+  clearTimeout(toastTimeout);
+  actionToastEl.classList.add('hiding');
+  setTimeout(() => {
+    actionToastEl.classList.add('hidden');
+    actionToastEl.classList.remove('hiding');
   }, 250);
 }
 
@@ -1253,7 +1362,7 @@ function setupEventListeners() {
     }
   });
 
-  // Отправка формы (Расход или Пополнение)
+  // Отправка формы (Добавление или Сохранение изменений)
   addFormEl.addEventListener('submit', (e) => {
     e.preventDefault();
     const amountNum = getNumpadAmountNumber();
@@ -1268,6 +1377,41 @@ function setupEventListeners() {
     const selectedCat = catList.find(c => c.id === catId) || catList[0];
     const commentVal = sheetCommentInputEl ? sheetCommentInputEl.value.trim() : '';
 
+    // Режим редактирования существующей операции
+    if (state.editingTxId) {
+      const idNum = Number(state.editingTxId);
+      const existingTx = state.transactions.find(t => t.id === idNum || t.id === state.editingTxId);
+      if (existingTx) {
+        // Откатываем старое влияние на баланс
+        if (existingTx.type === 'income') {
+          state.balance -= existingTx.amount;
+        } else {
+          state.balance += existingTx.amount;
+        }
+
+        // Применяем новые данные
+        existingTx.type = isIncome ? 'income' : 'expense';
+        existingTx.categoryId = selectedCat.id;
+        existingTx.amount = amountNum;
+        existingTx.comment = commentVal || selectedCat.name;
+
+        // Применяем новое влияние на баланс
+        if (isIncome) {
+          state.balance += amountNum;
+        } else {
+          state.balance -= amountNum;
+        }
+
+        saveState();
+        triggerHaptic('success');
+        closeBottomSheet();
+        renderApp();
+        showActionToast(existingTx, 'edited');
+        return;
+      }
+    }
+
+    // Режим добавления новой операции
     const newTx = {
       id: Date.now(),
       type: isIncome ? 'income' : 'expense',
@@ -1289,7 +1433,70 @@ function setupEventListeners() {
 
     closeBottomSheet();
     renderApp();
+    showActionToast(newTx, 'created');
   });
+
+  // Удаление операции прямо из шторки редактирования
+  if (sheetDeleteTxBtnEl) {
+    sheetDeleteTxBtnEl.addEventListener('click', () => {
+      if (!state.editingTxId) return;
+      const idNum = Number(state.editingTxId);
+      const tx = state.transactions.find(t => t.id === idNum || t.id === state.editingTxId);
+      if (!tx) return;
+
+      const opName = tx.type === 'income' ? 'пополнение' : 'расход';
+      if (confirm(`Удалить ${opName} "${tx.comment}" (${formatRub(tx.amount)})?`)) {
+        triggerHaptic('warning');
+        if (tx.type === 'income') {
+          state.balance -= tx.amount;
+        } else {
+          state.balance += tx.amount;
+        }
+        state.transactions = state.transactions.filter(t => t.id !== tx.id);
+        saveState();
+        closeBottomSheet();
+        renderApp();
+      }
+    });
+  }
+
+  // Toast Action: Отменить последнюю операцию
+  if (toastUndoBtnEl) {
+    toastUndoBtnEl.addEventListener('click', () => {
+      if (!state.recentTxId) return;
+      const idNum = Number(state.recentTxId);
+      const tx = state.transactions.find(t => t.id === idNum || t.id === state.recentTxId);
+      if (tx) {
+        triggerHaptic('warning');
+        if (tx.type === 'income') {
+          state.balance -= tx.amount;
+        } else {
+          state.balance += tx.amount;
+        }
+        state.transactions = state.transactions.filter(t => t.id !== tx.id);
+        saveState();
+        renderApp();
+      }
+      hideActionToast();
+    });
+  }
+
+  // Toast Action: Изменить последнюю операцию
+  if (toastEditBtnEl) {
+    toastEditBtnEl.addEventListener('click', () => {
+      if (!state.recentTxId) return;
+      const txId = state.recentTxId;
+      hideActionToast();
+      openEditSheet(txId);
+    });
+  }
+
+  // Toast Action: Закрыть тост
+  if (toastCloseBtnEl) {
+    toastCloseBtnEl.addEventListener('click', () => {
+      hideActionToast();
+    });
+  }
 
   // Удаление операции
   transactionsListEl.addEventListener('click', (e) => {

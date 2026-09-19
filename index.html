@@ -143,6 +143,19 @@
       </button>
     </div>
 
+    <!-- Dynamic Action Toast (Undo / Edit recent transaction) -->
+    <div id="action-toast" class="action-toast hidden" role="status" aria-live="polite">
+      <div class="toast-content">
+        <span class="toast-check-icon">✓</span>
+        <span id="toast-text" class="toast-text">Операция добавлена</span>
+      </div>
+      <div class="toast-actions">
+        <button type="button" id="toast-edit-btn" class="toast-btn toast-btn-edit">Изменить</button>
+        <button type="button" id="toast-undo-btn" class="toast-btn toast-btn-undo">Отменить</button>
+        <button type="button" id="toast-close-btn" class="toast-close-btn" aria-label="Закрыть">✕</button>
+      </div>
+    </div>
+
     <!-- Bottom Sheet Backdrop -->
     <div id="sheet-backdrop" class="sheet-backdrop hidden"></div>
 
@@ -252,6 +265,14 @@
         <!-- Submit Button -->
         <button type="submit" id="submit-btn" class="btn-submit-tx" disabled>
           Добавить расход
+        </button>
+
+        <!-- Delete Button (Only visible in edit mode) -->
+        <button type="button" id="sheet-delete-tx-btn" class="sheet-delete-tx-btn hidden">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span>Удалить операцию</span>
         </button>
       </form>
     </div>
