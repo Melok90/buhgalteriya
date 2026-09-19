@@ -859,19 +859,37 @@ body {
   gap: 18px;
 }
 
-/* Amount Input Group (iOS Prominent Headline) */
+/* Amount Input Group (Prominent Headline, Centered, No desktop arrows) */
 .amount-input-group {
   text-align: center;
-  padding: 4px 0;
+  padding: 4px 0 2px 0;
 }
 
 .amount-input-row {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
-  gap: 4px;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.25);
+  gap: 6px;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
   padding: 0 16px 8px 16px;
+  transition: border-color 0.2s ease;
+}
+
+.amount-input-row:focus-within {
+  border-bottom-color: #ffffff;
+}
+
+.amount-sign-indicator {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--ios-label-secondary);
+  line-height: 1;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.amount-sign-indicator.is-income {
+  color: var(--ios-green);
 }
 
 .amount-field {
@@ -879,66 +897,52 @@ body {
   border: none;
   outline: none;
   font-family: inherit;
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 44px;
+  font-weight: 800;
   color: var(--ios-label);
   text-align: center;
-  width: 180px;
+  width: 170px;
   caret-color: var(--ios-accent);
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.amount-field::-webkit-outer-spin-button,
+.amount-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .amount-field::placeholder {
-  color: var(--ios-label-tertiary);
+  color: rgba(255, 255, 255, 0.22);
 }
 
 .currency-symbol {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  color: var(--ios-label-tertiary);
+  color: var(--ios-label-secondary);
+  user-select: none;
 }
 
 .amount-hint {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--ios-label-tertiary);
   margin-top: 6px;
 }
 
-/* Details Stack */
-.form-inputs-stack {
+/* Category Grid (4x2 Compact, All Visible, Required) */
+.category-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.form-row-two {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.form-text-input {
-  width: 100%;
-  background-color: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  color: var(--ios-label);
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 400;
-  padding: 12px 16px;
-  min-height: 44px;
-  border-radius: var(--ios-radius-input);
-  outline: none;
-  transition: all 0.2s var(--ios-ease);
-}
-
-.form-text-input::placeholder {
-  color: var(--ios-label-tertiary);
-}
-
-.form-text-input:focus {
-  background-color: var(--ios-fill);
-  border-color: var(--ios-accent);
+.category-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2px;
 }
 
 .field-label {
@@ -948,78 +952,221 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ios-label-tertiary);
-  margin-bottom: 8px;
-  padding: 0 2px;
 }
 
-.category-horizontal-picker {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+.required-star {
+  color: var(--ios-red);
 }
 
-.category-horizontal-picker::-webkit-scrollbar {
-  display: none;
+.selected-cat-indicator {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 10px;
+  border-radius: 9999px;
+  letter-spacing: -0.01em;
+}
+
+.category-grid-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .cat-picker-item {
-  flex-shrink: 0;
-  min-width: 72px;
-  min-height: 64px;
-  padding: 10px 8px;
-  border-radius: var(--ios-radius-input);
+  position: relative;
   background-color: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 4px;
+  height: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
-  transition: all 0.2s var(--ios-spring);
+  transition: all 0.18s var(--ios-spring);
   font-family: inherit;
+  user-select: none;
 }
 
 .cat-picker-item:hover {
   background-color: var(--ios-fill);
 }
 
+.cat-picker-item:active {
+  transform: scale(0.96);
+}
+
 .cat-picker-item.selected {
-  background-color: var(--ios-accent-tint);
-  border-color: var(--ios-accent);
-  box-shadow: 0 0 12px var(--ios-accent-glow);
+  background-color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.22);
 }
 
 .cat-picker-icon-badge {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2px;
-  color: #ffffff;
+  color: var(--cat-color, #ffffff);
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
 .cat-picker-icon-badge svg {
   width: 20px;
   height: 20px;
-  color: #ffffff;
+}
+
+.cat-picker-item.selected .cat-picker-icon-badge {
+  color: #000000;
+  transform: scale(1.05);
 }
 
 .cat-picker-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ios-label-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 2px;
 }
 
 .cat-picker-item.selected .cat-picker-name {
-  color: #ffffff;
+  color: #000000;
+  font-weight: 700;
 }
 
-/* Primary Submit Action (min-height 50px) */
+/* Optional & Date Inset Grouped Card (Apple Native Style) */
+.inset-form-card {
+  background-color: var(--ios-bg-card);
+  border-radius: 14px;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.inset-form-row {
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
+  position: relative;
+  min-height: 44px;
+}
+
+.inset-form-row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 0;
+  height: 0.5px;
+  background-color: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.inset-row-label {
+  width: 80px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ios-label-secondary);
+}
+
+.inset-row-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ios-label);
+  padding: 0;
+}
+
+.inset-row-input::placeholder {
+  color: var(--ios-label-tertiary);
+}
+
+/* Date row & presets */
+.inset-date-row {
+  justify-content: space-between;
+}
+
+.date-quick-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-preset-btn {
+  background: var(--ios-fill-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: var(--ios-label-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.date-preset-btn:hover {
+  background: var(--ios-fill);
+  color: var(--ios-label);
+}
+
+.date-preset-btn.active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+.date-picker-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ios-fill-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: var(--ios-label-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.date-picker-label:hover {
+  background: var(--ios-fill);
+  color: var(--ios-label);
+}
+
+.date-picker-label.active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.date-native-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Primary Submit Action (Apple Prominent Action) */
 .btn-submit-tx {
   background-color: #ffffff;
   color: #000000;
@@ -1035,18 +1182,21 @@ body {
   margin-top: 4px;
 }
 
-.btn-submit-tx:hover {
-  background-color: #e4e4e7;
+.btn-submit-tx:hover:not(:disabled) {
+  background-color: #f2f2f7;
+  transform: translateY(-1px);
 }
 
-.btn-submit-tx:active {
+.btn-submit-tx:active:not(:disabled) {
   transform: scale(0.98);
-  opacity: 0.9;
 }
 
 .btn-submit-tx:disabled {
-  opacity: 0.4;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* ==========================================================================

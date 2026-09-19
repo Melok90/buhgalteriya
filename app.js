@@ -55,6 +55,63 @@ const CATEGORIES = [
     hex: '#ff9f0a', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`
   },
+  {
+    id: 'other',
+    name: 'Другое',
+    hex: '#8e8e93',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>`
+  }
+];
+
+const INCOME_CATEGORIES = [
+  {
+    id: 'salary',
+    name: 'Зарплата',
+    hex: '#30d158',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`
+  },
+  {
+    id: 'transfer',
+    name: 'Перевод',
+    hex: '#0a84ff',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`
+  },
+  {
+    id: 'cashback',
+    name: 'Кэшбэк',
+    hex: '#ffd60a',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`
+  },
+  {
+    id: 'invest',
+    name: 'Инвест',
+    hex: '#bf5af2',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`
+  },
+  {
+    id: 'business',
+    name: 'Бизнес',
+    hex: '#64d2ff',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`
+  },
+  {
+    id: 'gift',
+    name: 'Подарок',
+    hex: '#ff375f',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect width="20" height="5" x="2" y="7"/><line x1="12" x2="12" y1="22" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`
+  },
+  {
+    id: 'freelance',
+    name: 'Фриланс',
+    hex: '#ff9f0a',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><line x1="2" x2="22" y1="20" y2="20"/></svg>`
+  },
+  {
+    id: 'income_other',
+    name: 'Другое',
+    hex: '#8e8e93',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>`
+  }
 ];
 
 const INITIAL_BALANCE = 19605;
@@ -78,6 +135,7 @@ let state = {
   selectedFilter: 'all',
   searchQuery: '',
   selectedCatForNew: 'food',
+  selectedIncomeCatForNew: 'salary',
   isPrivate: localStorage.getItem(PRIVACY_KEY) === 'true',
   sheetType: 'expense'
 };
@@ -163,12 +221,18 @@ const sheetHandleWrapperEl = document.getElementById('sheet-handle-wrapper');
 const typeExpenseBtnEl = document.getElementById('type-expense-btn');
 const typeIncomeBtnEl = document.getElementById('type-income-btn');
 const categoryPickerGroupEl = document.getElementById('category-picker-group');
+const selectedCatLabelEl = document.getElementById('selected-cat-label');
 const addFormEl = document.getElementById('add-form');
 const amountInputEl = document.getElementById('amount-input');
+const amountSignIndicatorEl = document.getElementById('amount-sign-indicator');
 const amountHintEl = document.getElementById('amount-hint');
 const commentInputEl = document.getElementById('comment-input');
 const placeInputEl = document.getElementById('place-input');
 const dateInputEl = document.getElementById('date-input');
+const dateBtnTodayEl = document.getElementById('date-btn-today');
+const dateBtnYesterdayEl = document.getElementById('date-btn-yesterday');
+const dateCustomLabelEl = document.getElementById('date-custom-label');
+const customDateTextEl = document.getElementById('custom-date-text');
 const catPickerContainerEl = document.getElementById('category-picker');
 const submitBtnEl = document.getElementById('submit-btn');
 const resetBtnEl = document.getElementById('reset-btn');
@@ -223,9 +287,27 @@ function renderCategoryChips() {
 }
 
 function renderCategoryPicker() {
-  const cats = CATEGORIES.filter(c => c.id !== 'all');
+  const isIncome = state.sheetType === 'income';
+  const cats = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
+  const currentCatId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
+
+  let activeCat = cats.find(c => c.id === currentCatId);
+  if (!activeCat) {
+    activeCat = cats[0];
+    if (isIncome) state.selectedIncomeCatForNew = activeCat.id;
+    else state.selectedCatForNew = activeCat.id;
+  }
+
+  if (selectedCatLabelEl) {
+    selectedCatLabelEl.textContent = activeCat.name;
+  }
+
+  if (commentInputEl) {
+    commentInputEl.placeholder = `По умолчанию: ${activeCat.name}`;
+  }
+
   catPickerContainerEl.innerHTML = cats.map(cat => {
-    const isSelected = state.selectedCatForNew === cat.id;
+    const isSelected = cat.id === activeCat.id;
     return `
       <button 
         type="button" 
@@ -233,6 +315,7 @@ function renderCategoryPicker() {
         class="cat-picker-item ${isSelected ? 'selected' : ''}"
         role="radio"
         aria-checked="${isSelected}"
+        style="--cat-color: ${cat.hex}"
       >
         <div class="cat-picker-icon-badge">
           ${cat.icon}
@@ -241,6 +324,20 @@ function renderCategoryPicker() {
       </button>
     `;
   }).join('');
+}
+
+function validateAddForm() {
+  const amountVal = parseFloat(amountInputEl ? amountInputEl.value : '0');
+  const hasValidAmount = !isNaN(amountVal) && amountVal > 0;
+  const isIncome = state.sheetType === 'income';
+  const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
+  const hasCategory = Boolean(catId);
+  const hasDate = Boolean(dateInputEl && dateInputEl.value);
+
+  const isValid = hasValidAmount && hasCategory && hasDate;
+  if (submitBtnEl) {
+    submitBtnEl.disabled = !isValid;
+  }
 }
 
 function renderPrivacyIcon() {
@@ -398,18 +495,20 @@ function groupTransactionsByDate(txList) {
     transactionsListEl.innerHTML = dateGroups.map(group => {
       const itemsHtml = group.items.map(tx => {
         const isIncome = tx.type === 'income';
-        const cat = CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1];
+        const cat = isIncome
+          ? (INCOME_CATEGORIES.find(c => c.id === tx.categoryId) || INCOME_CATEGORIES[0])
+          : (CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1]);
         const metaParts = [];
         if (tx.place) metaParts.push(escapeHtml(tx.place));
         if (isIncome) {
-          metaParts.push('Пополнение');
+          metaParts.push(cat ? cat.name : 'Пополнение');
         } else if (cat && cat.name && cat.id !== 'all') {
           metaParts.push(cat.name);
         }
         const subtitle = metaParts.join(' · ');
 
-        const incomeIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
-        const iconSvg = isIncome ? incomeIcon : cat.icon;
+        const incomeDefaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
+        const iconSvg = cat ? cat.icon : (isIncome ? incomeDefaultIcon : CATEGORIES[1].icon);
         const amountDisplay = isIncome ? `+${formatRub(tx.amount)}` : formatRub(tx.amount);
         const amountClass = isIncome ? 'tx-amount num-tabular is-income' : 'tx-amount num-tabular';
 
@@ -558,16 +657,63 @@ document.addEventListener('click', (e) => {
 let sheetStartY = 0;
 let isDraggingSheet = false;
 
+function setSheetDate(presetOrDate) {
+  const today = new Date();
+  let targetDate;
+
+  if (presetOrDate === 'today') {
+    targetDate = today;
+    if (dateBtnTodayEl) dateBtnTodayEl.classList.add('active');
+    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.remove('active');
+    if (dateCustomLabelEl) dateCustomLabelEl.classList.remove('active');
+    if (customDateTextEl) customDateTextEl.textContent = '📅';
+  } else if (presetOrDate === 'yesterday') {
+    targetDate = new Date(today);
+    targetDate.setDate(today.getDate() - 1);
+    if (dateBtnTodayEl) dateBtnTodayEl.classList.remove('active');
+    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.add('active');
+    if (dateCustomLabelEl) dateCustomLabelEl.classList.remove('active');
+    if (customDateTextEl) customDateTextEl.textContent = '📅';
+  } else {
+    // Custom date string: YYYY-MM-DD
+    const parts = String(presetOrDate).split('-');
+    if (parts.length === 3) {
+      targetDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    } else {
+      targetDate = new Date(presetOrDate);
+    }
+    if (dateBtnTodayEl) dateBtnTodayEl.classList.remove('active');
+    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.remove('active');
+    if (dateCustomLabelEl) dateCustomLabelEl.classList.add('active');
+    const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    if (customDateTextEl && !isNaN(targetDate.getTime())) {
+      customDateTextEl.textContent = `${targetDate.getDate()} ${months[targetDate.getMonth()]}`;
+    }
+  }
+
+  const yyyy = targetDate.getFullYear();
+  const mm = String(targetDate.getMonth() + 1).padStart(2, '0');
+  const dd = String(targetDate.getDate()).padStart(2, '0');
+  if (dateInputEl) {
+    dateInputEl.value = `${yyyy}-${mm}-${dd}`;
+  }
+  validateAddForm();
+}
+
 function setSheetType(type) {
   state.sheetType = type;
-  if (type === 'income') {
+  const isIncome = type === 'income';
+
+  if (isIncome) {
     typeIncomeBtnEl.classList.add('active');
     typeExpenseBtnEl.classList.remove('active');
     typeIncomeBtnEl.setAttribute('aria-selected', 'true');
     typeExpenseBtnEl.setAttribute('aria-selected', 'false');
-    categoryPickerGroupEl.classList.add('hidden');
+    if (amountSignIndicatorEl) {
+      amountSignIndicatorEl.textContent = '+';
+      amountSignIndicatorEl.classList.add('is-income');
+    }
     amountHintEl.textContent = 'Введите сумму пополнения';
-    commentInputEl.placeholder = 'Откуда (например, Зарплата, Перевод)';
     placeInputEl.placeholder = 'Источник / Банк';
     submitBtnEl.textContent = 'Пополнить баланс';
   } else {
@@ -575,12 +721,17 @@ function setSheetType(type) {
     typeIncomeBtnEl.classList.remove('active');
     typeExpenseBtnEl.setAttribute('aria-selected', 'true');
     typeIncomeBtnEl.setAttribute('aria-selected', 'false');
-    categoryPickerGroupEl.classList.remove('hidden');
+    if (amountSignIndicatorEl) {
+      amountSignIndicatorEl.textContent = '−';
+      amountSignIndicatorEl.classList.remove('is-income');
+    }
     amountHintEl.textContent = 'Введите сумму расхода';
-    commentInputEl.placeholder = 'Название (например, Продукты)';
-    placeInputEl.placeholder = 'Место покупки';
+    placeInputEl.placeholder = 'Магазин или сервис';
     submitBtnEl.textContent = 'Сохранить расход';
   }
+
+  renderCategoryPicker();
+  validateAddForm();
 }
 
 function openBottomSheet(type = 'expense') {
@@ -589,10 +740,11 @@ function openBottomSheet(type = 'expense') {
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
   bottomSheetEl.style.transform = '';
-  if (dateInputEl) {
-    dateInputEl.value = new Date().toISOString().split('T')[0];
-  }
-  renderCategoryPicker();
+  setSheetDate('today');
+  amountInputEl.value = '';
+  commentInputEl.value = '';
+  placeInputEl.value = '';
+  validateAddForm();
   setTimeout(() => amountInputEl.focus(), 200);
 }
 
@@ -610,7 +762,8 @@ function closeBottomSheet() {
     amountInputEl.value = '';
     commentInputEl.value = '';
     placeInputEl.value = '';
-    if (dateInputEl) dateInputEl.value = '';
+    setSheetDate('today');
+    validateAddForm();
   }, 250);
 }
 
@@ -865,30 +1018,77 @@ function setupEventListeners() {
     const btn = e.target.closest('button[data-picker-id]');
     if (!btn) return;
     triggerHaptic('selection');
-    state.selectedCatForNew = btn.dataset.pickerId;
+    if (state.sheetType === 'income') {
+      state.selectedIncomeCatForNew = btn.dataset.pickerId;
+    } else {
+      state.selectedCatForNew = btn.dataset.pickerId;
+    }
     renderCategoryPicker();
+    validateAddForm();
   });
+
+  // Живая валидация суммы (кнопка сохранения активируется при сумме > 0)
+  amountInputEl.addEventListener('input', () => {
+    validateAddForm();
+  });
+
+  // Быстрые пресеты даты
+  if (dateBtnTodayEl) {
+    dateBtnTodayEl.addEventListener('click', () => {
+      triggerHaptic('selection');
+      setSheetDate('today');
+    });
+  }
+
+  if (dateBtnYesterdayEl) {
+    dateBtnYesterdayEl.addEventListener('click', () => {
+      triggerHaptic('selection');
+      setSheetDate('yesterday');
+    });
+  }
+
+  if (dateInputEl) {
+    dateInputEl.addEventListener('change', (e) => {
+      if (e.target.value) {
+        triggerHaptic('selection');
+        setSheetDate(e.target.value);
+      }
+    });
+  }
 
   // Отправка формы (Расход или Пополнение)
   addFormEl.addEventListener('submit', (e) => {
     e.preventDefault();
     const amountNum = parseFloat(amountInputEl.value);
     if (!amountNum || isNaN(amountNum) || amountNum <= 0) {
-      alert('Пожалуйста, введите корректную сумму');
+      triggerHaptic('warning');
+      amountInputEl.focus();
       return;
     }
 
     const isIncome = state.sheetType === 'income';
-    const comment = commentInputEl.value.trim() || (isIncome ? 'Пополнение' : 'Расход');
-    const place = placeInputEl.value.trim() || (isIncome ? 'Перевод' : '');
-    const dateVal = dateInputEl && dateInputEl.value 
-      ? new Date(dateInputEl.value).toISOString() 
-      : new Date().toISOString();
+    const catList = isIncome ? INCOME_CATEGORIES : CATEGORIES;
+    const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
+    const selectedCat = catList.find(c => c.id === catId) || catList[0];
+
+    // Если заметка не введена — по умолчанию название выбранной категории
+    const comment = commentInputEl.value.trim() || selectedCat.name;
+    // Место опционально
+    const place = placeInputEl.value.trim() || '';
+
+    // Корректная дата с сохранением локального дня
+    let dateVal = new Date().toISOString();
+    if (dateInputEl && dateInputEl.value) {
+      const parts = dateInputEl.value.split('-').map(Number);
+      if (parts.length === 3) {
+        dateVal = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0).toISOString();
+      }
+    }
 
     const newTx = {
       id: Date.now(),
       type: isIncome ? 'income' : 'expense',
-      categoryId: isIncome ? 'all' : state.selectedCatForNew,
+      categoryId: selectedCat.id,
       amount: amountNum,
       comment: comment,
       place: place,

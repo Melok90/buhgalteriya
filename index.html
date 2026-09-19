@@ -164,10 +164,11 @@
         </button>
       </div>
 
-      <form id="add-form" class="sheet-form">
-        <!-- Amount Input -->
+      <form id="add-form" class="sheet-form" novalidate>
+        <!-- Amount Input (Clean, Centered, No Arrows) -->
         <div class="amount-input-group">
-          <div class="amount-input-row">
+          <div class="amount-input-row" id="amount-row-wrapper">
+            <span id="amount-sign-indicator" class="amount-sign-indicator">−</span>
             <input 
               id="amount-input" 
               type="number" 
@@ -177,49 +178,72 @@
               class="amount-field num-tabular" 
               required
               aria-label="Сумма операции в рублях"
+              autocomplete="off"
             />
             <span class="currency-symbol">₽</span>
           </div>
-          <p id="amount-hint" class="amount-hint">Введите сумму расхода</p>
+          <p id="amount-hint" class="amount-hint">Введите сумму операции</p>
         </div>
 
-        <!-- Details Inputs -->
-        <div class="form-inputs-stack">
-          <input 
-            id="comment-input" 
-            type="text" 
-            placeholder="Название (например, Продукты)" 
-            class="form-text-input" 
-            required
-            aria-label="Название операции"
-          />
-          <div class="form-row-two">
-            <input 
-              id="place-input" 
-              type="text" 
-              placeholder="Место покупки" 
-              class="form-text-input"
-              aria-label="Место покупки или источник"
-            />
-            <input 
-              id="date-input" 
-              type="date" 
-              class="form-text-input num-tabular"
-              aria-label="Дата операции"
-            />
+        <!-- Category Grid (4x2 Compact, All Visible, Required) -->
+        <div id="category-picker-group" class="category-section">
+          <div class="category-section-header">
+            <label class="field-label">Категория <span class="required-star">*</span></label>
+            <span id="selected-cat-label" class="selected-cat-indicator">Еда</span>
+          </div>
+          <div id="category-picker" class="category-grid-picker" role="radiogroup" aria-label="Выбор категории">
+            <!-- Rendered dynamically by JS -->
           </div>
         </div>
 
-        <!-- Category Picker (hidden for income) -->
-        <div id="category-picker-group">
-          <label class="field-label">Категория</label>
-          <div id="category-picker" class="category-horizontal-picker" role="radiogroup">
-            <!-- Rendered dynamically -->
+        <!-- Optional & Date Inset Grouped Card (Apple Style) -->
+        <div class="inset-form-card">
+          <!-- Row 1: Comment / Name (Optional) -->
+          <div class="inset-form-row">
+            <span class="inset-row-label">Заметка</span>
+            <input 
+              id="comment-input" 
+              type="text" 
+              placeholder="По умолчанию категория" 
+              class="inset-row-input" 
+              aria-label="Название операции"
+            />
+          </div>
+
+          <!-- Row 2: Place (Optional) -->
+          <div class="inset-form-row">
+            <span class="inset-row-label">Место</span>
+            <input 
+              id="place-input" 
+              type="text" 
+              placeholder="Магазин или сервис" 
+              class="inset-row-input"
+              aria-label="Место покупки"
+            />
+          </div>
+
+          <!-- Row 3: Date (Required with quick presets) -->
+          <div class="inset-form-row inset-date-row">
+            <span class="inset-row-label">Дата <span class="required-star">*</span></span>
+            <div class="date-quick-presets" role="group" aria-label="Выбор даты">
+              <button type="button" id="date-btn-today" class="date-preset-btn active" data-preset="today">Сегодня</button>
+              <button type="button" id="date-btn-yesterday" class="date-preset-btn" data-preset="yesterday">Вчера</button>
+              <label id="date-custom-label" class="date-picker-label" title="Выбрать другую дату">
+                <span id="custom-date-text">📅</span>
+                <input 
+                  id="date-input" 
+                  type="date" 
+                  class="date-native-input"
+                  aria-label="Выбрать конкретную дату"
+                  required
+                />
+              </label>
+            </div>
           </div>
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" id="submit-btn" class="btn-submit-tx">
+        <button type="submit" id="submit-btn" class="btn-submit-tx" disabled>
           Сохранить расход
         </button>
       </form>
