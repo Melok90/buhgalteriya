@@ -148,7 +148,6 @@ const privacyToggleBtnEl = document.getElementById('privacy-toggle-btn');
 const spendingPeriodLabelEl = document.getElementById('spending-period-label');
 const totalSpentBadgeEl = document.getElementById('total-spent-amount');
 const dailyAvgAmountEl = document.getElementById('daily-avg-amount');
-const quickIncomeBtnEl = document.getElementById('quick-income-btn');
 const quickAnalyticsBtnEl = document.getElementById('quick-analytics-btn');
 const txCountBadgeEl = document.getElementById('tx-count-badge');
 const searchInputEl = document.getElementById('search-input');
@@ -796,13 +795,7 @@ function setupEventListeners() {
     });
   }
 
-  // Быстрые действия на карточке баланса
-  if (quickIncomeBtnEl) {
-    quickIncomeBtnEl.addEventListener('click', () => {
-      openBottomSheet('income');
-    });
-  }
-
+  // Кнопка аналитики на карточке баланса
   if (quickAnalyticsBtnEl) {
     quickAnalyticsBtnEl.addEventListener('click', () => {
       openAnalyticsSheet();
