@@ -666,7 +666,8 @@ function renderApp() {
         }
         const subtitle = metaParts.join(' · ');
 
-        const incomeDefaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
+        const catColor = cat ? (cat.hex || '#8e8e93') : (isIncome ? '#30d158' : '#8e8e93');
+        const incomeDefaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
         const iconSvg = cat ? cat.icon : (isIncome ? incomeDefaultIcon : CATEGORIES[1].icon);
         const amountDisplay = isIncome ? `+${formatRub(tx.amount)}` : formatRub(tx.amount);
         const amountClass = isIncome ? 'tx-amount num-tabular is-income' : 'tx-amount num-tabular';
@@ -690,7 +691,7 @@ function renderApp() {
 
             <!-- Front Swipe Row -->
             <div class="tx-item" data-tx-row="${tx.id}">
-              <div class="tx-icon-badge">
+              <div class="tx-icon-badge" style="--cat-color: ${catColor};">
                 ${iconSvg}
               </div>
               
