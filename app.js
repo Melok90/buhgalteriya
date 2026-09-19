@@ -224,6 +224,8 @@ const typeIncomeBtnEl = document.getElementById('type-income-btn');
 const addFormEl = document.getElementById('add-form');
 const numpadAmountValEl = document.getElementById('numpad-amount-value');
 const quickCategoryStripEl = document.getElementById('quick-category-strip');
+const sheetNoteInputEl = document.getElementById('sheet-note-input');
+const sheetNoteClearBtnEl = document.getElementById('sheet-note-clear-btn');
 const touchNumpadGridEl = document.querySelector('.touch-numpad-grid');
 const submitBtnEl = document.getElementById('submit-btn');
 const resetBtnEl = document.getElementById('reset-btn');
@@ -513,10 +515,11 @@ function renderApp() {
           : (CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1]);
         const metaParts = [];
         if (tx.place) metaParts.push(escapeHtml(tx.place));
-        if (isIncome) {
-          metaParts.push(cat ? cat.name : 'Пополнение');
-        } else if (cat && cat.name && cat.id !== 'all') {
-          metaParts.push(cat.name);
+        const catName = cat ? cat.name : (isIncome ? 'Пополнение' : '');
+        if (catName && cat.id !== 'all') {
+          if (tx.comment !== catName || tx.place) {
+            metaParts.push(catName);
+          }
         }
         const subtitle = metaParts.join(' · ');
 
@@ -686,6 +689,12 @@ function setSheetType(type) {
     typeIncomeBtnEl.setAttribute('aria-selected', 'false');
   }
 
+  if (sheetNoteInputEl) {
+    sheetNoteInputEl.placeholder = isIncome
+      ? 'Подпись к пополнению (необязательно)'
+      : 'Подпись к расходу (необязательно)';
+  }
+
   renderQuickCategoryStrip();
   updateNumpadDisplay();
 }
@@ -693,6 +702,10 @@ function setSheetType(type) {
 function openBottomSheet(type = 'expense') {
   triggerHaptic('medium');
   state.numpadBuffer = '0';
+  if (sheetNoteInputEl) {
+    sheetNoteInputEl.value = '';
+    if (sheetNoteClearBtnEl) sheetNoteClearBtnEl.classList.add('hidden');
+  }
   setSheetType(type);
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
@@ -712,6 +725,11 @@ function closeBottomSheet() {
     bottomSheetEl.style.transform = '';
     sheetBackdropEl.style.opacity = '';
     state.numpadBuffer = '0';
+    if (sheetNoteInputEl) {
+      sheetNoteInputEl.value = '';
+      if (sheetNoteClearBtnEl) sheetNoteClearBtnEl.classList.add('hidden');
+      sheetNoteInputEl.blur();
+    }
     updateNumpadDisplay();
   }, 250);
 }
@@ -977,6 +995,23 @@ function setupEventListeners() {
     });
   }
 
+  // Поле подписи (заметки) к расходу/пополнению
+  if (sheetNoteInputEl && sheetNoteClearBtnEl) {
+    sheetNoteInputEl.addEventListener('input', () => {
+      if (sheetNoteInputEl.value.trim().length > 0) {
+        sheetNoteClearBtnEl.classList.remove('hidden');
+      } else {
+        sheetNoteClearBtnEl.classList.add('hidden');
+      }
+    });
+
+    sheetNoteClearBtnEl.addEventListener('click', () => {
+      sheetNoteInputEl.value = '';
+      sheetNoteClearBtnEl.classList.add('hidden');
+      sheetNoteInputEl.focus();
+    });
+  }
+
   // Нажатия клавиш цифровой клавиатуры (Numpad 3x4)
   if (touchNumpadGridEl) {
     touchNumpadGridEl.addEventListener('click', (e) => {
@@ -989,6 +1024,20 @@ function setupEventListeners() {
   // Поддержка физической клавиатуры с ПК
   window.addEventListener('keydown', (e) => {
     if (bottomSheetEl.classList.contains('hidden')) return;
+
+    // Если фокус в текстовом поле подписи — позволяем вводить текст и цифры без перехвата
+    if (document.activeElement === sheetNoteInputEl || e.target === sheetNoteInputEl) {
+      if (e.key === 'Escape') {
+        sheetNoteInputEl.blur();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (getNumpadAmountNumber() > 0) {
+          addFormEl.dispatchEvent(new Event('submit'));
+        }
+      }
+      return;
+    }
+
     if (e.key >= '0' && e.key <= '9') {
       handleNumpadKey(e.key);
     } else if (e.key === 'Backspace') {
@@ -1016,13 +1065,14 @@ function setupEventListeners() {
     const catList = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
     const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
     const selectedCat = catList.find(c => c.id === catId) || catList[0];
+    const noteVal = sheetNoteInputEl ? sheetNoteInputEl.value.trim() : '';
 
     const newTx = {
       id: Date.now(),
       type: isIncome ? 'income' : 'expense',
       categoryId: selectedCat.id,
       amount: amountNum,
-      comment: selectedCat.name,
+      comment: noteVal || selectedCat.name,
       place: '',
       date: new Date().toISOString()
     };
