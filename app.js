@@ -69,13 +69,17 @@ const INITIAL_TRANSACTIONS = [
   { id: 6, categoryId: 'sport', amount: 499, comment: 'Спорт', place: 'Велопрокат', date: new Date(Date.now() - 500000000).toISOString() },
 ];
 
+const PRIVACY_KEY = 'accounting_privacy_mode';
+
 // --- 2. Управление состоянием ---
 let state = {
   balance: INITIAL_BALANCE,
   transactions: [...INITIAL_TRANSACTIONS],
   selectedFilter: 'all',
   searchQuery: '',
-  selectedCatForNew: 'food'
+  selectedCatForNew: 'food',
+  isPrivate: localStorage.getItem(PRIVACY_KEY) === 'true',
+  sheetType: 'expense'
 };
 
 function loadState() {
@@ -85,6 +89,10 @@ function loadState() {
       const parsed = JSON.parse(saved);
       if (typeof parsed.balance === 'number') state.balance = parsed.balance;
       if (Array.isArray(parsed.transactions)) state.transactions = parsed.transactions;
+    }
+    const priv = localStorage.getItem(PRIVACY_KEY);
+    if (priv !== null) {
+      state.isPrivate = priv === 'true';
     }
   } catch (err) {
     console.warn('Не удалось прочитать localStorage', err);
@@ -97,6 +105,7 @@ function saveState() {
       balance: state.balance,
       transactions: state.transactions
     }));
+    localStorage.setItem(PRIVACY_KEY, String(state.isPrivate));
   } catch (err) {
     console.warn('Не удалось записать в localStorage', err);
   }
@@ -134,23 +143,43 @@ const categoriesFilterEl = document.getElementById('categories-filter');
 const transactionsListEl = document.getElementById('transactions-list');
 const balanceCardEl = document.getElementById('balance-card');
 const balanceValueEl = document.getElementById('balance-value');
+const balanceAmountTriggerEl = document.getElementById('balance-amount-trigger');
+const privacyToggleBtnEl = document.getElementById('privacy-toggle-btn');
+const spendingPeriodLabelEl = document.getElementById('spending-period-label');
 const totalSpentBadgeEl = document.getElementById('total-spent-amount');
+const dailyAvgAmountEl = document.getElementById('daily-avg-amount');
+const quickIncomeBtnEl = document.getElementById('quick-income-btn');
+const quickAnalyticsBtnEl = document.getElementById('quick-analytics-btn');
 const txCountBadgeEl = document.getElementById('tx-count-badge');
 const searchInputEl = document.getElementById('search-input');
 const searchClearBtnEl = document.getElementById('search-clear-btn');
 const emptyStateEl = document.getElementById('empty-state');
 const fabBtnEl = document.getElementById('fab-add-btn');
+
+// Bottom Sheet (Расход / Пополнение)
 const sheetBackdropEl = document.getElementById('sheet-backdrop');
 const bottomSheetEl = document.getElementById('bottom-sheet');
 const sheetCloseBtnEl = document.getElementById('sheet-close-btn');
 const sheetHandleWrapperEl = document.getElementById('sheet-handle-wrapper');
+const typeExpenseBtnEl = document.getElementById('type-expense-btn');
+const typeIncomeBtnEl = document.getElementById('type-income-btn');
+const categoryPickerGroupEl = document.getElementById('category-picker-group');
 const addFormEl = document.getElementById('add-form');
 const amountInputEl = document.getElementById('amount-input');
+const amountHintEl = document.getElementById('amount-hint');
 const commentInputEl = document.getElementById('comment-input');
 const placeInputEl = document.getElementById('place-input');
 const dateInputEl = document.getElementById('date-input');
 const catPickerContainerEl = document.getElementById('category-picker');
+const submitBtnEl = document.getElementById('submit-btn');
 const resetBtnEl = document.getElementById('reset-btn');
+
+// Analytics Sheet
+const analyticsBackdropEl = document.getElementById('analytics-backdrop');
+const analyticsSheetEl = document.getElementById('analytics-sheet');
+const analyticsCloseBtnEl = document.getElementById('analytics-close-btn');
+const analyticsHandleWrapperEl = document.getElementById('analytics-handle-wrapper');
+const analyticsBodyEl = document.getElementById('analytics-body');
 
 // --- 5. Вспомогательные функции форматирования ---
 function formatRub(num) {
@@ -215,11 +244,74 @@ function renderCategoryPicker() {
   }).join('');
 }
 
-function renderApp() {
-  const totalSpent = state.transactions.reduce((acc, curr) => acc + curr.amount, 0);
+function renderPrivacyIcon() {
+  const privacyIconEl = document.getElementById('privacy-icon');
+  if (!privacyIconEl) return;
+  if (state.isPrivate) {
+    privacyIconEl.innerHTML = `
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+    `;
+    privacyToggleBtnEl.setAttribute('aria-label', 'Показать баланс');
+    privacyToggleBtnEl.setAttribute('title', 'Показать баланс');
+  } else {
+    privacyIconEl.innerHTML = `
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    `;
+    privacyToggleBtnEl.setAttribute('aria-label', 'Скрыть баланс');
+    privacyToggleBtnEl.setAttribute('title', 'Скрыть баланс');
+  }
+}
 
-  balanceValueEl.textContent = formatRub(state.balance);
-  totalSpentBadgeEl.textContent = formatRub(totalSpent);
+function togglePrivacy() {
+  triggerHaptic('light');
+  state.isPrivate = !state.isPrivate;
+  saveState();
+  renderApp();
+}
+
+function renderApp() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const currentDay = Math.max(now.getDate(), 1);
+  const monthNames = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  ];
+  const monthName = monthNames[currentMonth];
+
+  // Расходы текущего месяца (исключая пополнения)
+  const monthExpenseTxs = state.transactions.filter(tx => {
+    if (tx.type === 'income') return false;
+    if (!tx.date) return false;
+    const d = new Date(tx.date);
+    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+  });
+
+  const allExpenseTxs = state.transactions.filter(tx => tx.type !== 'income');
+  const monthSpent = monthExpenseTxs.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+  const totalSpent = allExpenseTxs.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+
+  const displaySpent = monthSpent > 0 ? monthSpent : totalSpent;
+  const periodTitle = monthSpent > 0 ? monthName : 'Всего трат';
+  const dailyAvg = Math.round(displaySpent / currentDay);
+
+  if (spendingPeriodLabelEl) {
+    spendingPeriodLabelEl.textContent = periodTitle;
+  }
+
+  // Режим приватности (маскировка сумм)
+  if (state.isPrivate) {
+    balanceValueEl.textContent = '•••••• ₽';
+    totalSpentBadgeEl.textContent = '•••••• ₽';
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = '~••• ₽';
+  } else {
+    balanceValueEl.textContent = formatRub(state.balance);
+    totalSpentBadgeEl.textContent = formatRub(displaySpent);
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = `~${formatRub(dailyAvg)}`;
+  }
+  renderPrivacyIcon();
 
   // Скрытие плашки баланса при активном поиске/фильтре
   const hasFilter = state.selectedFilter !== 'all';
@@ -286,7 +378,9 @@ function groupTransactionsByDate(txList) {
     }
     const group = groups.get(key);
     group.items.push(tx);
-    group.total += tx.amount;
+    if (tx.type !== 'income') {
+      group.total += Number(tx.amount) || 0;
+    }
   });
 
   return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
@@ -304,11 +398,21 @@ function groupTransactionsByDate(txList) {
 
     transactionsListEl.innerHTML = dateGroups.map(group => {
       const itemsHtml = group.items.map(tx => {
+        const isIncome = tx.type === 'income';
         const cat = CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1];
         const metaParts = [];
         if (tx.place) metaParts.push(escapeHtml(tx.place));
-        if (cat && cat.name && cat.id !== 'all') metaParts.push(cat.name);
+        if (isIncome) {
+          metaParts.push('Пополнение');
+        } else if (cat && cat.name && cat.id !== 'all') {
+          metaParts.push(cat.name);
+        }
         const subtitle = metaParts.join(' · ');
+
+        const incomeIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
+        const iconSvg = isIncome ? incomeIcon : cat.icon;
+        const amountDisplay = isIncome ? `+${formatRub(tx.amount)}` : formatRub(tx.amount);
+        const amountClass = isIncome ? 'tx-amount num-tabular is-income' : 'tx-amount num-tabular';
 
         return `
           <div class="tx-swipe-wrapper" data-tx-wrapper="${tx.id}">
@@ -319,7 +423,7 @@ function groupTransactionsByDate(txList) {
               data-id="${tx.id}" 
               class="tx-delete-action"
               title="Удалить запись"
-              aria-label="Удалить расход ${escapeHtml(tx.comment)}"
+              aria-label="Удалить операцию ${escapeHtml(tx.comment)}"
             >
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -330,7 +434,7 @@ function groupTransactionsByDate(txList) {
             <!-- Front Swipe Row -->
             <div class="tx-item" data-tx-row="${tx.id}">
               <div class="tx-icon-badge">
-                ${cat.icon}
+                ${iconSvg}
               </div>
               
               <div class="tx-info">
@@ -339,7 +443,7 @@ function groupTransactionsByDate(txList) {
               </div>
 
               <div class="tx-amount-col">
-                <span class="tx-amount num-tabular">${formatRub(tx.amount)}</span>
+                <span class="${amountClass}">${amountDisplay}</span>
               </div>
 
               <div class="tx-chevron-indicator">
@@ -455,8 +559,34 @@ document.addEventListener('click', (e) => {
 let sheetStartY = 0;
 let isDraggingSheet = false;
 
-function openBottomSheet() {
+function setSheetType(type) {
+  state.sheetType = type;
+  if (type === 'income') {
+    typeIncomeBtnEl.classList.add('active');
+    typeExpenseBtnEl.classList.remove('active');
+    typeIncomeBtnEl.setAttribute('aria-selected', 'true');
+    typeExpenseBtnEl.setAttribute('aria-selected', 'false');
+    categoryPickerGroupEl.classList.add('hidden');
+    amountHintEl.textContent = 'Введите сумму пополнения';
+    commentInputEl.placeholder = 'Откуда (например, Зарплата, Перевод)';
+    placeInputEl.placeholder = 'Источник / Банк';
+    submitBtnEl.textContent = 'Пополнить баланс';
+  } else {
+    typeExpenseBtnEl.classList.add('active');
+    typeIncomeBtnEl.classList.remove('active');
+    typeExpenseBtnEl.setAttribute('aria-selected', 'true');
+    typeIncomeBtnEl.setAttribute('aria-selected', 'false');
+    categoryPickerGroupEl.classList.remove('hidden');
+    amountHintEl.textContent = 'Введите сумму расхода';
+    commentInputEl.placeholder = 'Название (например, Продукты)';
+    placeInputEl.placeholder = 'Место покупки';
+    submitBtnEl.textContent = 'Сохранить расход';
+  }
+}
+
+function openBottomSheet(type = 'expense') {
   triggerHaptic('medium');
+  setSheetType(type);
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
   bottomSheetEl.style.transform = '';
@@ -516,8 +646,184 @@ function initSheetDrag() {
   });
 }
 
+// --- 8.1 Экран Аналитики (Modal Sheet) ---
+function openAnalyticsSheet() {
+  triggerHaptic('medium');
+  renderAnalytics();
+  analyticsBackdropEl.classList.remove('hidden');
+  analyticsSheetEl.classList.remove('hidden');
+  analyticsSheetEl.style.transform = '';
+}
+
+function closeAnalyticsSheet() {
+  triggerHaptic('light');
+  analyticsSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+  analyticsSheetEl.style.transform = 'translateY(100%)';
+  analyticsBackdropEl.style.opacity = '0';
+
+  setTimeout(() => {
+    analyticsBackdropEl.classList.add('hidden');
+    analyticsSheetEl.classList.add('hidden');
+    analyticsSheetEl.style.transform = '';
+    analyticsBackdropEl.style.opacity = '';
+  }, 250);
+}
+
+function renderAnalytics() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const currentDay = Math.max(now.getDate(), 1);
+  const monthNames = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  ];
+  const monthName = monthNames[currentMonth];
+
+  const monthExpenses = state.transactions.filter(tx => {
+    if (tx.type === 'income') return false;
+    if (!tx.date) return false;
+    const d = new Date(tx.date);
+    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+  });
+
+  const txs = monthExpenses.length > 0 ? monthExpenses : state.transactions.filter(tx => tx.type !== 'income');
+  const total = txs.reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+  const avgDay = Math.round(total / currentDay);
+
+  // Группировка расходов по категориям
+  const catMap = {};
+  txs.forEach(tx => {
+    const cId = tx.categoryId || 'food';
+    catMap[cId] = (catMap[cId] || 0) + Number(tx.amount);
+  });
+
+  const sortedCats = Object.entries(catMap)
+    .map(([cId, amount]) => {
+      const catObj = CATEGORIES.find(c => c.id === cId) || { name: 'Другое', icon: '•' };
+      const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
+      return { id: cId, name: catObj.name, icon: catObj.icon, amount, pct };
+    })
+    .sort((a, b) => b.amount - a.amount);
+
+  analyticsBodyEl.innerHTML = `
+    <div class="analytics-stat-grid">
+      <div class="analytics-stat-card">
+        <span class="analytics-stat-label">Траты в ${monthName.toLowerCase()}е</span>
+        <span class="analytics-stat-val num-tabular">${formatRub(total)}</span>
+      </div>
+      <div class="analytics-stat-card">
+        <span class="analytics-stat-label">В день в среднем</span>
+        <span class="analytics-stat-val num-tabular">${formatRub(avgDay)}</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="analytics-section-title">Распределение по категориям</div>
+      <div class="analytics-categories-list">
+        ${sortedCats.length === 0 ? '<p style="color: var(--ios-label-secondary); font-size: 13px;">Нет расходов за этот период</p>' : sortedCats.map(cat => `
+          <div class="analytics-cat-item">
+            <div class="analytics-cat-header">
+              <div class="analytics-cat-left">
+                <div class="analytics-cat-icon">${cat.icon}</div>
+                <span class="analytics-cat-name">${escapeHtml(cat.name)}</span>
+                <span class="analytics-cat-pct">${cat.pct}%</span>
+              </div>
+              <span class="analytics-cat-amount num-tabular">${formatRub(cat.amount)}</span>
+            </div>
+            <div class="analytics-cat-bar-bg">
+              <div class="analytics-cat-bar-fill" style="width: ${cat.pct}%;"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function initAnalyticsDrag() {
+  if (!analyticsHandleWrapperEl) return;
+  let startY = 0;
+  let isDragging = false;
+
+  analyticsHandleWrapperEl.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    analyticsSheetEl.style.transition = 'none';
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const diffY = currentY - startY;
+    if (diffY > 0) {
+      analyticsSheetEl.style.transform = `translateY(${diffY}px)`;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const currentY = e.changedTouches[0].clientY;
+    const diffY = currentY - startY;
+
+    if (diffY > 80) {
+      closeAnalyticsSheet();
+    } else {
+      analyticsSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+      analyticsSheetEl.style.transform = 'translateY(0)';
+    }
+  });
+}
+
 // --- 9. Слушатели событий ---
 function setupEventListeners() {
+  // Переключение режима приватности
+  if (privacyToggleBtnEl) {
+    privacyToggleBtnEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePrivacy();
+    });
+  }
+
+  if (balanceAmountTriggerEl) {
+    balanceAmountTriggerEl.addEventListener('click', togglePrivacy);
+    balanceAmountTriggerEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        togglePrivacy();
+      }
+    });
+  }
+
+  // Быстрые действия на карточке баланса
+  if (quickIncomeBtnEl) {
+    quickIncomeBtnEl.addEventListener('click', () => {
+      openBottomSheet('income');
+    });
+  }
+
+  if (quickAnalyticsBtnEl) {
+    quickAnalyticsBtnEl.addEventListener('click', () => {
+      openAnalyticsSheet();
+    });
+  }
+
+  // Переключение Расход / Пополнение в шторке
+  if (typeExpenseBtnEl) {
+    typeExpenseBtnEl.addEventListener('click', () => {
+      triggerHaptic('selection');
+      setSheetType('expense');
+    });
+  }
+
+  if (typeIncomeBtnEl) {
+    typeIncomeBtnEl.addEventListener('click', () => {
+      triggerHaptic('selection');
+      setSheetType('income');
+    });
+  }
+
   // Фильтры категорий
   categoriesFilterEl.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-cat]');
@@ -549,9 +855,17 @@ function setupEventListeners() {
   });
 
   // Модалка добавления
-  fabBtnEl.addEventListener('click', openBottomSheet);
+  fabBtnEl.addEventListener('click', () => openBottomSheet('expense'));
   sheetCloseBtnEl.addEventListener('click', closeBottomSheet);
   sheetBackdropEl.addEventListener('click', closeBottomSheet);
+
+  // Модалка аналитики
+  if (analyticsCloseBtnEl) {
+    analyticsCloseBtnEl.addEventListener('click', closeAnalyticsSheet);
+  }
+  if (analyticsBackdropEl) {
+    analyticsBackdropEl.addEventListener('click', closeAnalyticsSheet);
+  }
 
   // Выбор категории внутри шторки
   catPickerContainerEl.addEventListener('click', (e) => {
@@ -562,7 +876,7 @@ function setupEventListeners() {
     renderCategoryPicker();
   });
 
-  // Отправка формы расхода
+  // Отправка формы (Расход или Пополнение)
   addFormEl.addEventListener('submit', (e) => {
     e.preventDefault();
     const amountNum = parseFloat(amountInputEl.value);
@@ -571,15 +885,17 @@ function setupEventListeners() {
       return;
     }
 
-    const comment = commentInputEl.value.trim() || 'Расход';
-    const place = placeInputEl.value.trim() || '';
+    const isIncome = state.sheetType === 'income';
+    const comment = commentInputEl.value.trim() || (isIncome ? 'Пополнение' : 'Расход');
+    const place = placeInputEl.value.trim() || (isIncome ? 'Перевод' : '');
     const dateVal = dateInputEl && dateInputEl.value 
       ? new Date(dateInputEl.value).toISOString() 
       : new Date().toISOString();
 
     const newTx = {
       id: Date.now(),
-      categoryId: state.selectedCatForNew,
+      type: isIncome ? 'income' : 'expense',
+      categoryId: isIncome ? 'all' : state.selectedCatForNew,
       amount: amountNum,
       comment: comment,
       place: place,
@@ -587,7 +903,11 @@ function setupEventListeners() {
     };
 
     state.transactions.unshift(newTx);
-    state.balance -= amountNum;
+    if (isIncome) {
+      state.balance += amountNum;
+    } else {
+      state.balance -= amountNum;
+    }
     saveState();
     triggerHaptic('success');
 
@@ -595,7 +915,7 @@ function setupEventListeners() {
     renderApp();
   });
 
-  // Удаление расхода
+  // Удаление операции
   transactionsListEl.addEventListener('click', (e) => {
     const delBtn = e.target.closest('button[data-action="delete"]');
     if (!delBtn) return;
@@ -605,9 +925,14 @@ function setupEventListeners() {
     const tx = state.transactions.find(t => t.id === id);
     if (!tx) return;
 
-    if (confirm(`Удалить расход "${tx.comment}" (${formatRub(tx.amount)})?`)) {
+    const opName = tx.type === 'income' ? 'пополнение' : 'расход';
+    if (confirm(`Удалить ${opName} "${tx.comment}" (${formatRub(tx.amount)})?`)) {
       triggerHaptic('warning');
-      state.balance += tx.amount;
+      if (tx.type === 'income') {
+        state.balance -= tx.amount;
+      } else {
+        state.balance += tx.amount;
+      }
       state.transactions = state.transactions.filter(t => t.id !== id);
       saveState();
       renderApp();
@@ -619,10 +944,12 @@ function setupEventListeners() {
     if (confirm('Сбросить данные к начальным значениям со скриншота (19 605 ₽)?')) {
       triggerHaptic('heavy');
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PRIVACY_KEY);
       state.balance = INITIAL_BALANCE;
       state.transactions = [...INITIAL_TRANSACTIONS];
       state.selectedFilter = 'all';
       state.searchQuery = '';
+      state.isPrivate = false;
       searchInputEl.value = '';
       searchClearBtnEl.classList.add('hidden');
       saveState();
@@ -631,14 +958,19 @@ function setupEventListeners() {
     }
   });
 
-  // Закрытие шторки по клавише Escape
+  // Закрытие шторок по клавише Escape
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !bottomSheetEl.classList.contains('hidden')) {
-      closeBottomSheet();
+    if (e.key === 'Escape') {
+      if (!bottomSheetEl.classList.contains('hidden')) {
+        closeBottomSheet();
+      } else if (analyticsSheetEl && !analyticsSheetEl.classList.contains('hidden')) {
+        closeAnalyticsSheet();
+      }
     }
   });
 
   initSheetDrag();
+  initAnalyticsDrag();
 }
 
 // --- 10. Инициализация ---
