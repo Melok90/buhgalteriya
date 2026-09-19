@@ -122,6 +122,7 @@ body {
   flex-direction: column;
   gap: 12px;
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
 .top-bar {
@@ -293,13 +294,16 @@ body {
    Scrollable Main Area
    ========================================================================== */
 .main-scroll-area {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 94px) 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .main-scroll-area::-webkit-scrollbar {
@@ -321,6 +325,7 @@ body {
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: transform 0.2s var(--ios-spring), box-shadow 0.2s ease;
+  flex-shrink: 0;
 }
 
 .balance-card-header {
@@ -485,6 +490,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 4px;
+  flex-shrink: 0;
 }
 
 .section-title {
@@ -505,6 +511,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .date-group-section {
@@ -548,6 +555,7 @@ body {
   position: relative;
   overflow: hidden;
   background-color: var(--ios-red);
+  touch-action: pan-y;
 }
 
 /* Hairline separator between items */
@@ -603,6 +611,7 @@ body {
   transform: translateX(0px);
   transition: transform 0.24s var(--ios-spring), background-color 0.15s ease;
   min-height: 44px;
+  touch-action: pan-y;
 }
 
 .tx-item:active {

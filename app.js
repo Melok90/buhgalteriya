@@ -594,8 +594,10 @@ function attachSwipeListeners() {
   const rows = transactionsListEl.querySelectorAll('[data-tx-row]');
   rows.forEach(row => {
     let startX = 0;
+    let startY = 0;
     let currentX = 0;
     let isSwiping = false;
+    let isHorizontalGesture = null;
 
     row.addEventListener('touchstart', (e) => {
       // Закрываем любую другую открытую строку
@@ -603,15 +605,37 @@ function attachSwipeListeners() {
         closeSwipedRow(activeSwipedRow);
       }
       startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
       currentX = startX;
       isSwiping = true;
+      isHorizontalGesture = null;
       row.style.transition = 'none';
     }, { passive: true });
 
     row.addEventListener('touchmove', (e) => {
       if (!isSwiping) return;
       currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
       const diffX = currentX - startX;
+      const diffY = currentY - startY;
+
+      // Если жест вертикальный — отменяем свайп строки, чтобы нативный вертикальный скролл работал свободно
+      if (isHorizontalGesture === null) {
+        if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
+          if (Math.abs(diffY) >= Math.abs(diffX)) {
+            isHorizontalGesture = false;
+            isSwiping = false;
+            row.style.transform = '';
+            return;
+          } else {
+            isHorizontalGesture = true;
+          }
+        } else {
+          return;
+        }
+      }
+
+      if (!isHorizontalGesture) return;
 
       // Свайп только влево (до 78px с легким сопротивлением)
       if (diffX < 0) {
