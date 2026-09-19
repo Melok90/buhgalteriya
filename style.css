@@ -351,12 +351,46 @@ body {
   color: var(--ios-label-secondary);
 }
 
+.balance-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Compact white pill in the header */
+.header-income-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 11px;
+  height: 28px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s var(--ios-ease);
+}
+
+.header-income-btn:hover {
+  background-color: #f2f2f7;
+}
+
+.header-income-btn:active {
+  transform: scale(0.95);
+  background-color: #e5e5ea;
+}
+
 /* Privacy Toggle Button */
 .privacy-toggle-btn {
   background-color: rgba(255, 255, 255, 0.06);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -442,20 +476,19 @@ body {
   flex-shrink: 0;
 }
 
-/* Quick Actions (Apple-style pill buttons) */
+/* Quick Actions (Bottom Analytics Button) */
 .balance-quick-actions {
   display: flex;
-  gap: 8px;
 }
 
 .quick-action-btn {
-  flex: 1;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 38px;
-  border-radius: 19px;
+  gap: 7px;
+  min-height: 36px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
@@ -463,36 +496,20 @@ body {
   transition: all 0.2s var(--ios-ease);
 }
 
-.quick-action-primary {
-  background-color: #ffffff;
-  color: #000000;
-  border: none;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+.quick-action-analytics {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--ios-label-secondary);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
-.quick-action-primary:hover {
-  background-color: #f2f2f7;
+.quick-action-analytics:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--ios-label);
 }
 
-.quick-action-primary:active {
-  transform: scale(0.96);
-  background-color: #e5e5ea;
-}
-
-.quick-action-secondary {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
-}
-
-.quick-action-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-}
-
-.quick-action-secondary:active {
-  transform: scale(0.96);
-  background-color: rgba(255, 255, 255, 0.16);
+.quick-action-analytics:active {
+  transform: scale(0.98);
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
 /* ==========================================================================
