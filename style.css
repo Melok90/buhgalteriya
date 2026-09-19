@@ -430,41 +430,43 @@ body {
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .date-group-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 1px;
 }
 
 .date-group-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 0 4px;
+  padding: 6px 2px 3px 2px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
 .date-group-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--ios-label-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ios-label-tertiary);
 }
 
 .date-group-total {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--ios-label-tertiary);
 }
 
 .date-group-card {
-  background-color: var(--ios-bg-secondary);
-  border-radius: var(--ios-radius-card);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: none;
 }
 
 /* Container for each swipable row */
@@ -479,10 +481,10 @@ body {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 64px;
+  left: 40px;
   right: 0;
   height: 0.5px;
-  background-color: rgba(84, 84, 88, 0.35);
+  background-color: rgba(255, 255, 255, 0.05);
   z-index: 3;
   pointer-events: none;
 }
@@ -493,7 +495,7 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 84px;
+  width: 78px;
   background-color: var(--ios-red);
   color: #ffffff;
   border: none;
@@ -501,7 +503,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   font-size: 11px;
   font-weight: 600;
   font-family: inherit;
@@ -514,19 +516,19 @@ body {
   background-color: #d70015;
 }
 
-/* Front Sliding Row */
+/* Front Sliding Row (Compact 44px HIG target on pure background) */
 .tx-item {
   position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background-color: var(--ios-bg-secondary);
+  gap: 10px;
+  padding: 6px 2px;
+  background-color: var(--ios-bg-primary);
   cursor: pointer;
   transform: translateX(0px);
   transition: transform 0.24s var(--ios-spring), background-color 0.15s ease;
-  min-height: 64px;
+  min-height: 44px;
 }
 
 .tx-item:active {
@@ -534,8 +536,8 @@ body {
 }
 
 .tx-icon-badge {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -547,8 +549,8 @@ body {
 }
 
 .tx-icon-badge svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   color: #ffffff;
 }
 
@@ -557,28 +559,28 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   justify-content: center;
 }
 
 .tx-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--ios-label);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .tx-subtitle {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
-  color: var(--ios-label-secondary);
+  color: var(--ios-label-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .tx-amount-col {
@@ -588,15 +590,15 @@ body {
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  min-width: 76px;
+  min-width: 68px;
 }
 
 .tx-amount {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--ios-label);
   white-space: nowrap;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .tx-chevron-indicator {
@@ -604,8 +606,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 2px;
+  margin-left: 1px;
   flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.tx-chevron-indicator svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* ==========================================================================

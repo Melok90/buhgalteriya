@@ -395,13 +395,13 @@ function attachSwipeListeners() {
       currentX = e.touches[0].clientX;
       const diffX = currentX - startX;
 
-      // Свайп только влево (до 84px с легким сопротивлением)
+      // Свайп только влево (до 78px с легким сопротивлением)
       if (diffX < 0) {
-        const translate = Math.max(diffX, -95);
+        const translate = Math.max(diffX, -88);
         row.style.transform = `translateX(${translate}px)`;
       } else if (row.dataset.open === 'true') {
         // Если была открыта, тянем вправо
-        const translate = Math.min(diffX - 84, 0);
+        const translate = Math.min(diffX - 78, 0);
         row.style.transform = `translateX(${translate}px)`;
       }
     }, { passive: true });
@@ -412,9 +412,9 @@ function attachSwipeListeners() {
       const diffX = currentX - startX;
       row.style.transition = 'transform 0.25s var(--ios-spring)';
 
-      if (diffX < -38) {
+      if (diffX < -32) {
         // Раскрыть кнопку удаления
-        row.style.transform = 'translateX(-84px)';
+        row.style.transform = 'translateX(-78px)';
         row.dataset.open = 'true';
         activeSwipedRow = row;
         triggerHaptic('light');
