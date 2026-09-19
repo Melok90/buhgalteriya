@@ -296,21 +296,11 @@ body {
 .main-scroll-area {
   flex: 1 1 0%;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 94px) 16px;
+  overflow: hidden;
+  padding: 12px 16px 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-}
-
-.main-scroll-area::-webkit-scrollbar {
-  display: none;
-}
-.main-scroll-area {
-  scrollbar-width: none;
+  gap: 14px;
 }
 
 /* ==========================================================================
@@ -508,10 +498,21 @@ body {
 }
 
 .transactions-list {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex-shrink: 0;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 94px);
+}
+
+.transactions-list::-webkit-scrollbar {
+  display: none;
 }
 
 .date-group-section {
@@ -703,6 +704,9 @@ body {
    Empty State
    ========================================================================== */
 .empty-state {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
   text-align: center;
   padding: 50px 20px;
   color: var(--ios-label-secondary);
