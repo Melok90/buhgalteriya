@@ -921,128 +921,166 @@ body {
   pointer-events: none;
 }
 
-/* 1-Row Compact Category Strip */
-.quick-category-section {
-  width: 100%;
-  overflow: hidden;
+/* Quick Amount Chips (100 ₽, 500 ₽, 1 000 ₽) */
+.quick-chips-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
   padding: 2px 0;
 }
 
-.quick-category-strip {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 2px 4px 4px 4px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.quick-category-strip::-webkit-scrollbar {
-  display: none;
-}
-
-.quick-cat-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--ios-fill-tertiary);
+.quick-chip-btn {
+  background-color: var(--ios-fill-tertiary);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
-  color: var(--ios-label-secondary);
+  color: var(--ios-label);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 6px 16px;
   border-radius: 9999px;
   cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.16s var(--ios-spring);
+  transition: all 0.15s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.quick-cat-pill:hover {
-  background: var(--ios-fill);
-  color: var(--ios-label);
+.quick-chip-btn:hover {
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
-.quick-cat-pill:active {
+.quick-chip-btn:active {
   transform: scale(0.95);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.quick-cat-pill.selected {
-  background: #ffffff;
+/* Selected Category Card (Replacing Crypto Wallet Row) */
+.selected-category-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s var(--ios-spring);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.selected-category-card:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+.selected-category-card:active {
+  transform: scale(0.985);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.selected-cat-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-cat-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--cat-bg, #30d158);
   color: #000000;
-  border-color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.22);
-}
-
-.quick-cat-pill-icon {
-  width: 14px;
-  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--cat-color, #ffffff);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.2s ease;
 }
 
-.quick-cat-pill-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-.quick-cat-pill.selected .quick-cat-pill-icon {
-  color: #000000;
-}
-
-.quick-cat-pill.selected .quick-cat-pill-icon svg {
+.selected-cat-icon-badge svg {
+  width: 20px;
+  height: 20px;
   stroke: #000000;
 }
 
-/* Optional Note / Comment Input ("Подпись") */
-.sheet-note-wrapper {
+.selected-cat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.selected-cat-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ios-label);
+  letter-spacing: -0.01em;
+}
+
+.selected-cat-subtitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ios-label-secondary);
+}
+
+.selected-cat-arrow {
+  color: var(--ios-label-tertiary);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.selected-category-card:hover .selected-cat-arrow {
+  transform: translateX(2px);
+  color: var(--ios-label);
+}
+
+/* Optional Note / Comment Input ("+ Комментарий") */
+.sheet-comment-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  background-color: var(--ios-fill-tertiary);
+  background-color: rgba(255, 255, 255, 0.06);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 0 10px;
-  height: 38px;
+  padding: 0 12px;
+  height: 40px;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.sheet-note-wrapper:focus-within {
+.sheet-comment-wrapper:focus-within {
   background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
-.sheet-note-icon {
+.sheet-comment-plus {
   color: var(--ios-label-tertiary);
+  font-size: 17px;
+  font-weight: 400;
   margin-right: 8px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
+  line-height: 1;
+  user-select: none;
 }
 
-.sheet-note-input {
+.sheet-comment-input {
   flex: 1;
   background: transparent;
   border: none;
   color: var(--ios-label);
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   padding: 0;
   outline: none;
   min-width: 0;
 }
 
-.sheet-note-input::placeholder {
+.sheet-comment-input::placeholder {
   color: var(--ios-label-tertiary);
   font-weight: 400;
 }
 
-.sheet-note-clear-btn {
+.sheet-comment-clear-btn {
   background: transparent;
   border: none;
   color: var(--ios-label-tertiary);
@@ -1056,59 +1094,156 @@ body {
   transition: color 0.15s ease;
 }
 
-.sheet-note-clear-btn:hover {
+.sheet-comment-clear-btn:hover {
   color: var(--ios-label);
 }
 
-/* Large Touch Numpad (3x4) */
-.touch-numpad-grid {
+/* Calculator-like Keypad (Clean, Flat, Borderless) */
+.calculator-keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 2px 8px;
   max-width: 360px;
   margin: 0 auto;
   width: 100%;
 }
 
-.numpad-key {
-  background-color: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.06);
-  color: var(--ios-label);
+.calc-key {
+  background: transparent;
+  border: none;
+  color: #ffffff;
   font-family: inherit;
-  font-size: 22px;
-  font-weight: 600;
-  height: clamp(44px, 5.8vh, 50px);
+  font-size: 26px;
+  font-weight: 500;
+  height: clamp(46px, 6.2vh, 52px);
   border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.12s var(--ios-spring);
+  transition: background-color 0.12s ease, transform 0.1s ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-.numpad-key:hover {
-  background-color: var(--ios-fill);
+.calc-key:hover {
+  background-color: rgba(255, 255, 255, 0.07);
 }
 
-.numpad-key:active,
-.numpad-key.is-pressed {
-  background-color: rgba(255, 255, 255, 0.22);
-  transform: scale(0.94);
+.calc-key:active,
+.calc-key.is-pressed {
+  background-color: rgba(255, 255, 255, 0.16);
+  transform: scale(0.92);
 }
 
-.key-delete {
-  color: var(--ios-red);
+.calc-key-dot {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 0.6;
 }
 
-.key-delete:hover {
-  background-color: rgba(255, 69, 58, 0.15);
+.calc-key-delete {
+  color: #ffffff;
 }
 
-.key-delete:active,
-.key-delete.is-pressed {
-  background-color: rgba(255, 69, 58, 0.28);
+.calc-key-delete svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Category Picker Modal Sheet */
+.category-picker-sheet {
+  max-height: 80vh;
+  max-height: 80dvh;
+}
+
+.cat-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 4px 0 16px 0;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cat-picker-list::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.cat-picker-item:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.cat-picker-item:active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.cat-picker-item.selected {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cat-picker-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cat-picker-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--cat-color, #ffffff);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cat-picker-badge svg {
+  width: 18px;
+  height: 18px;
+  stroke: #000000;
+}
+
+.cat-picker-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cat-picker-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-label);
+}
+
+.cat-picker-today {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ios-label-tertiary);
+}
+
+.cat-picker-check {
+  color: var(--ios-green);
+  display: flex;
+  align-items: center;
 }
 
 /* Primary Submit Action (Apple Prominent Action) */

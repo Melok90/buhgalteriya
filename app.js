@@ -223,12 +223,23 @@ const typeExpenseBtnEl = document.getElementById('type-expense-btn');
 const typeIncomeBtnEl = document.getElementById('type-income-btn');
 const addFormEl = document.getElementById('add-form');
 const numpadAmountValEl = document.getElementById('numpad-amount-value');
-const quickCategoryStripEl = document.getElementById('quick-category-strip');
-const sheetNoteInputEl = document.getElementById('sheet-note-input');
-const sheetNoteClearBtnEl = document.getElementById('sheet-note-clear-btn');
-const touchNumpadGridEl = document.querySelector('.touch-numpad-grid');
+const quickChipsRowEl = document.querySelector('.quick-chips-row');
+const selectedCategoryBtnEl = document.getElementById('selected-category-btn');
+const selectedCatIconBadgeEl = document.getElementById('selected-cat-icon-badge');
+const selectedCatNameEl = document.getElementById('selected-cat-name');
+const selectedCatSubtitleEl = document.getElementById('selected-cat-subtitle');
+const sheetCommentInputEl = document.getElementById('sheet-comment-input');
+const sheetCommentClearBtnEl = document.getElementById('sheet-comment-clear-btn');
+const calculatorKeypadEl = document.querySelector('.calculator-keypad');
 const submitBtnEl = document.getElementById('submit-btn');
 const resetBtnEl = document.getElementById('reset-btn');
+
+// Category Picker Modal Sheet
+const categoryPickerBackdropEl = document.getElementById('category-picker-backdrop');
+const categoryPickerSheetEl = document.getElementById('category-picker-sheet');
+const categoryPickerCloseBtnEl = document.getElementById('cat-picker-close-btn');
+const categoryPickerHandleWrapperEl = document.getElementById('cat-picker-handle-wrapper');
+const categoryPickerListEl = document.getElementById('cat-picker-list');
 
 // Analytics Sheet
 const analyticsBackdropEl = document.getElementById('analytics-backdrop');
@@ -280,13 +291,18 @@ function renderCategoryChips() {
 }
 
 function getNumpadAmountNumber() {
-  return parseInt(state.numpadBuffer, 10) || 0;
+  return parseFloat(state.numpadBuffer) || 0;
 }
 
 function updateNumpadDisplay() {
   if (!numpadAmountValEl) return;
-  const num = parseInt(state.numpadBuffer, 10) || 0;
-  numpadAmountValEl.textContent = num.toLocaleString('ru-RU');
+  const parts = state.numpadBuffer.split('.');
+  const intPart = parseInt(parts[0], 10) || 0;
+  let formatted = intPart.toLocaleString('ru-RU');
+  if (parts.length > 1) {
+    formatted += '.' + parts[1];
+  }
+  numpadAmountValEl.textContent = formatted;
 
   const amountNum = getNumpadAmountNumber();
   const isIncome = state.sheetType === 'income';
@@ -295,8 +311,8 @@ function updateNumpadDisplay() {
     submitBtnEl.disabled = amountNum <= 0;
     if (amountNum > 0) {
       submitBtnEl.textContent = isIncome
-        ? `Пополнить ${formatRub(amountNum)}`
-        : `Добавить расход ${formatRub(amountNum)}`;
+        ? `Пополнить · ${formatRub(amountNum)}`
+        : `Добавить расход · ${formatRub(amountNum)}`;
     } else {
       submitBtnEl.textContent = isIncome ? 'Пополнить баланс' : 'Добавить расход';
     }
@@ -313,19 +329,57 @@ function handleNumpadKey(key) {
         state.numpadBuffer = '0';
       }
     }
+  } else if (key === '.') {
+    if (!state.numpadBuffer.includes('.')) {
+      state.numpadBuffer += '.';
+    }
   } else if (key >= '0' && key <= '9') {
     if (state.numpadBuffer === '0') {
       state.numpadBuffer = key;
-    } else if (state.numpadBuffer.length < 9) {
-      state.numpadBuffer += key;
+    } else {
+      const parts = state.numpadBuffer.split('.');
+      if (parts.length === 2 && parts[1].length >= 2) {
+        return; // максимум 2 знака после запятой
+      }
+      if (state.numpadBuffer.replace('.', '').length < 9) {
+        state.numpadBuffer += key;
+      }
     }
   }
   triggerHaptic('light');
   updateNumpadDisplay();
 }
 
-function renderQuickCategoryStrip() {
-  if (!quickCategoryStripEl) return;
+function handleQuickChip(amountToAdd) {
+  triggerHaptic('selection');
+  const current = getNumpadAmountNumber();
+  const next = current + amountToAdd;
+  state.numpadBuffer = String(next);
+  updateNumpadDisplay();
+}
+
+function getCategoryTodayTotal(catId, isIncome) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const currentDay = now.getDate();
+
+  return state.transactions
+    .filter(tx => {
+      const isTxIncome = tx.type === 'income';
+      if (isTxIncome !== isIncome) return false;
+      if (tx.categoryId !== catId) return false;
+      if (!tx.date) return false;
+      const d = new Date(tx.date);
+      return d.getFullYear() === currentYear &&
+             d.getMonth() === currentMonth &&
+             d.getDate() === currentDay;
+    })
+    .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+}
+
+function renderSelectedCategoryCard() {
+  if (!selectedCategoryBtnEl) return;
   const isIncome = state.sheetType === 'income';
   const cats = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
   const currentCatId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
@@ -337,23 +391,112 @@ function renderQuickCategoryStrip() {
     else state.selectedCatForNew = activeCat.id;
   }
 
-  quickCategoryStripEl.innerHTML = cats.map(cat => {
-    const isSelected = cat.id === activeCat.id;
+  if (selectedCatIconBadgeEl) {
+    selectedCatIconBadgeEl.innerHTML = activeCat.icon;
+    selectedCatIconBadgeEl.style.setProperty('--cat-bg', activeCat.hex || '#30d158');
+  }
+  if (selectedCatNameEl) {
+    selectedCatNameEl.textContent = activeCat.name;
+  }
+  if (selectedCatSubtitleEl) {
+    const todayTotal = getCategoryTodayTotal(activeCat.id, isIncome);
+    selectedCatSubtitleEl.textContent = `Сегодня · ${formatRub(todayTotal)}`;
+  }
+}
+
+function renderCategoryPickerList() {
+  if (!categoryPickerListEl) return;
+  const isIncome = state.sheetType === 'income';
+  const cats = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
+  const currentCatId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
+
+  categoryPickerListEl.innerHTML = cats.map(cat => {
+    const isSelected = cat.id === currentCatId;
+    const todayTotal = getCategoryTodayTotal(cat.id, isIncome);
     return `
-      <button 
-        type="button" 
-        data-strip-cat="${cat.id}" 
-        class="quick-cat-pill ${isSelected ? 'selected' : ''}"
-        role="radio"
-        aria-checked="${isSelected}"
+      <div 
+        class="cat-picker-item ${isSelected ? 'selected' : ''}" 
+        data-cat-id="${cat.id}"
+        role="button"
+        tabindex="0"
       >
-        <span class="quick-cat-pill-icon" style="--cat-color: ${cat.hex}">
-          ${cat.icon}
-        </span>
-        <span>${cat.name}</span>
-      </button>
+        <div class="cat-picker-left">
+          <div class="cat-picker-badge" style="--cat-color: ${cat.hex || '#6366f1'}">
+            ${cat.icon}
+          </div>
+          <div class="cat-picker-info">
+            <div class="cat-picker-name">${escapeHtml(cat.name)}</div>
+            <div class="cat-picker-today">Сегодня · ${formatRub(todayTotal)}</div>
+          </div>
+        </div>
+        ${isSelected ? `
+          <svg class="cat-picker-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        ` : ''}
+      </div>
     `;
   }).join('');
+}
+
+function openCategoryPicker() {
+  triggerHaptic('medium');
+  renderCategoryPickerList();
+  if (categoryPickerBackdropEl && categoryPickerSheetEl) {
+    categoryPickerBackdropEl.classList.remove('hidden');
+    categoryPickerSheetEl.classList.remove('hidden');
+    categoryPickerSheetEl.style.transform = '';
+  }
+}
+
+function closeCategoryPicker() {
+  triggerHaptic('light');
+  if (!categoryPickerSheetEl || !categoryPickerBackdropEl) return;
+  categoryPickerSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+  categoryPickerSheetEl.style.transform = 'translateY(100%)';
+  categoryPickerBackdropEl.style.opacity = '0';
+
+  setTimeout(() => {
+    categoryPickerBackdropEl.classList.add('hidden');
+    categoryPickerSheetEl.classList.add('hidden');
+    categoryPickerSheetEl.style.transform = '';
+    categoryPickerBackdropEl.style.opacity = '';
+  }, 250);
+}
+
+function initCategoryPickerDrag() {
+  if (!categoryPickerHandleWrapperEl || !categoryPickerSheetEl) return;
+  let startY = 0;
+  let isDragging = false;
+
+  categoryPickerHandleWrapperEl.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    categoryPickerSheetEl.style.transition = 'none';
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const diffY = currentY - startY;
+    if (diffY > 0) {
+      categoryPickerSheetEl.style.transform = `translateY(${diffY}px)`;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const currentY = e.changedTouches[0].clientY;
+    const diffY = currentY - startY;
+
+    if (diffY > 80) {
+      closeCategoryPicker();
+    } else {
+      categoryPickerSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+      categoryPickerSheetEl.style.transform = 'translateY(0)';
+    }
+  });
 }
 
 function renderPrivacyIcon() {
@@ -713,22 +856,20 @@ function setSheetType(type) {
     typeIncomeBtnEl.setAttribute('aria-selected', 'false');
   }
 
-  if (sheetNoteInputEl) {
-    sheetNoteInputEl.placeholder = isIncome
-      ? 'Подпись к пополнению (необязательно)'
-      : 'Подпись к расходу (необязательно)';
+  if (sheetCommentInputEl) {
+    sheetCommentInputEl.placeholder = 'Комментарий (необязательно)';
   }
 
-  renderQuickCategoryStrip();
+  renderSelectedCategoryCard();
   updateNumpadDisplay();
 }
 
 function openBottomSheet(type = 'expense') {
   triggerHaptic('medium');
   state.numpadBuffer = '0';
-  if (sheetNoteInputEl) {
-    sheetNoteInputEl.value = '';
-    if (sheetNoteClearBtnEl) sheetNoteClearBtnEl.classList.add('hidden');
+  if (sheetCommentInputEl) {
+    sheetCommentInputEl.value = '';
+    if (sheetCommentClearBtnEl) sheetCommentClearBtnEl.classList.add('hidden');
   }
   setSheetType(type);
   sheetBackdropEl.classList.remove('hidden');
@@ -739,6 +880,7 @@ function openBottomSheet(type = 'expense') {
 
 function closeBottomSheet() {
   triggerHaptic('light');
+  closeCategoryPicker();
   bottomSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
   bottomSheetEl.style.transform = 'translateY(100%)';
   sheetBackdropEl.style.opacity = '0';
@@ -749,10 +891,10 @@ function closeBottomSheet() {
     bottomSheetEl.style.transform = '';
     sheetBackdropEl.style.opacity = '';
     state.numpadBuffer = '0';
-    if (sheetNoteInputEl) {
-      sheetNoteInputEl.value = '';
-      if (sheetNoteClearBtnEl) sheetNoteClearBtnEl.classList.add('hidden');
-      sheetNoteInputEl.blur();
+    if (sheetCommentInputEl) {
+      sheetCommentInputEl.value = '';
+      if (sheetCommentClearBtnEl) sheetCommentClearBtnEl.classList.add('hidden');
+      sheetCommentInputEl.blur();
     }
     updateNumpadDisplay();
   }, 250);
@@ -1000,45 +1142,68 @@ function setupEventListeners() {
   if (analyticsCloseBtnEl) {
     analyticsCloseBtnEl.addEventListener('click', closeAnalyticsSheet);
   }
-  if (analyticsBackdropEl) {
-    analyticsBackdropEl.addEventListener('click', closeAnalyticsSheet);
+  // Открытие модалки выбора категории
+  if (selectedCategoryBtnEl) {
+    selectedCategoryBtnEl.addEventListener('click', () => {
+      openCategoryPicker();
+    });
   }
 
-  // Выбор категории внутри быстрой полоски
-  if (quickCategoryStripEl) {
-    quickCategoryStripEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('button[data-strip-cat]');
-      if (!btn) return;
+  // Модалка выбора категории
+  if (categoryPickerCloseBtnEl) {
+    categoryPickerCloseBtnEl.addEventListener('click', closeCategoryPicker);
+  }
+  if (categoryPickerBackdropEl) {
+    categoryPickerBackdropEl.addEventListener('click', closeCategoryPicker);
+  }
+  if (categoryPickerListEl) {
+    categoryPickerListEl.addEventListener('click', (e) => {
+      const item = e.target.closest('.cat-picker-item[data-cat-id]');
+      if (!item) return;
       triggerHaptic('selection');
+      const catId = item.dataset.catId;
       if (state.sheetType === 'income') {
-        state.selectedIncomeCatForNew = btn.dataset.stripCat;
+        state.selectedIncomeCatForNew = catId;
       } else {
-        state.selectedCatForNew = btn.dataset.stripCat;
+        state.selectedCatForNew = catId;
       }
-      renderQuickCategoryStrip();
+      renderSelectedCategoryCard();
+      closeCategoryPicker();
     });
   }
 
-  // Поле подписи (заметки) к расходу/пополнению
-  if (sheetNoteInputEl && sheetNoteClearBtnEl) {
-    sheetNoteInputEl.addEventListener('input', () => {
-      if (sheetNoteInputEl.value.trim().length > 0) {
-        sheetNoteClearBtnEl.classList.remove('hidden');
-      } else {
-        sheetNoteClearBtnEl.classList.add('hidden');
+  // Быстрые чипы добавления сумм
+  if (quickChipsRowEl) {
+    quickChipsRowEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-add]');
+      if (!btn) return;
+      const addVal = parseFloat(btn.dataset.add) || 0;
+      if (addVal > 0) {
+        handleQuickChip(addVal);
       }
-    });
-
-    sheetNoteClearBtnEl.addEventListener('click', () => {
-      sheetNoteInputEl.value = '';
-      sheetNoteClearBtnEl.classList.add('hidden');
-      sheetNoteInputEl.focus();
     });
   }
 
-  // Нажатия клавиш цифровой клавиатуры (Numpad 3x4)
-  if (touchNumpadGridEl) {
-    touchNumpadGridEl.addEventListener('click', (e) => {
+  // Поле комментария к операции
+  if (sheetCommentInputEl && sheetCommentClearBtnEl) {
+    sheetCommentInputEl.addEventListener('input', () => {
+      if (sheetCommentInputEl.value.trim().length > 0) {
+        sheetCommentClearBtnEl.classList.remove('hidden');
+      } else {
+        sheetCommentClearBtnEl.classList.add('hidden');
+      }
+    });
+
+    sheetCommentClearBtnEl.addEventListener('click', () => {
+      sheetCommentInputEl.value = '';
+      sheetCommentClearBtnEl.classList.add('hidden');
+      sheetCommentInputEl.focus();
+    });
+  }
+
+  // Нажатия клавиш калькуляторной клавиатуры (3x4)
+  if (calculatorKeypadEl) {
+    calculatorKeypadEl.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-key]');
       if (!btn) return;
       handleNumpadKey(btn.dataset.key);
@@ -1049,10 +1214,19 @@ function setupEventListeners() {
   window.addEventListener('keydown', (e) => {
     if (bottomSheetEl.classList.contains('hidden')) return;
 
-    // Если фокус в текстовом поле подписи — позволяем вводить текст и цифры без перехвата
-    if (document.activeElement === sheetNoteInputEl || e.target === sheetNoteInputEl) {
+    // Если открыт выбор категории — Escape закрывает только его
+    if (categoryPickerSheetEl && !categoryPickerSheetEl.classList.contains('hidden')) {
       if (e.key === 'Escape') {
-        sheetNoteInputEl.blur();
+        e.stopPropagation();
+        closeCategoryPicker();
+        return;
+      }
+    }
+
+    // Если фокус в текстовом поле комментария — позволяем вводить текст и цифры без перехвата
+    if (document.activeElement === sheetCommentInputEl || e.target === sheetCommentInputEl) {
+      if (e.key === 'Escape') {
+        sheetCommentInputEl.blur();
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (getNumpadAmountNumber() > 0) {
@@ -1064,6 +1238,8 @@ function setupEventListeners() {
 
     if (e.key >= '0' && e.key <= '9') {
       handleNumpadKey(e.key);
+    } else if (e.key === '.' || e.key === ',') {
+      handleNumpadKey('.');
     } else if (e.key === 'Backspace') {
       handleNumpadKey('del');
     } else if (e.key === 'Enter') {
@@ -1089,14 +1265,14 @@ function setupEventListeners() {
     const catList = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
     const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
     const selectedCat = catList.find(c => c.id === catId) || catList[0];
-    const noteVal = sheetNoteInputEl ? sheetNoteInputEl.value.trim() : '';
+    const commentVal = sheetCommentInputEl ? sheetCommentInputEl.value.trim() : '';
 
     const newTx = {
       id: Date.now(),
       type: isIncome ? 'income' : 'expense',
       categoryId: selectedCat.id,
       amount: amountNum,
-      comment: noteVal || selectedCat.name,
+      comment: commentVal || selectedCat.name,
       place: '',
       date: new Date().toISOString()
     };
@@ -1160,7 +1336,9 @@ function setupEventListeners() {
   // Закрытие шторок по клавише Escape
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (!bottomSheetEl.classList.contains('hidden')) {
+      if (categoryPickerSheetEl && !categoryPickerSheetEl.classList.contains('hidden')) {
+        closeCategoryPicker();
+      } else if (!bottomSheetEl.classList.contains('hidden')) {
         closeBottomSheet();
       } else if (analyticsSheetEl && !analyticsSheetEl.classList.contains('hidden')) {
         closeAnalyticsSheet();
@@ -1170,13 +1348,14 @@ function setupEventListeners() {
 
   initSheetDrag();
   initAnalyticsDrag();
+  initCategoryPickerDrag();
 }
 
 // --- 10. Инициализация ---
 function init() {
   loadState();
   renderCategoryChips();
-  renderQuickCategoryStrip();
+  renderSelectedCategoryCard();
   renderApp();
   setupEventListeners();
 }
