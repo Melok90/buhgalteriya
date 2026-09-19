@@ -878,24 +878,8 @@ body {
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
-  gap: 6px;
-}
-
-.numpad-sign-indicator {
-  font-size: 38px;
-  font-weight: 700;
-  color: var(--ios-label-secondary);
-  line-height: 1;
-  transition: color 0.2s ease;
-  user-select: none;
-}
-
-.numpad-sign-indicator.is-income {
-  color: var(--ios-green);
-}
-
 .numpad-amount-value {
-  font-size: 46px;
+  font-size: 52px;
   font-weight: 800;
   color: var(--ios-label);
   line-height: 1;
@@ -904,51 +888,15 @@ body {
 }
 
 .numpad-currency {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--ios-label-secondary);
   user-select: none;
 }
 
-/* Quick Amount Chips (+100, +500, +1000, +5000, Reset) */
-.quick-chips-row {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding: 0 4px;
-}
-
-.quick-chip-btn {
-  background: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  color: var(--ios-label);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 13px;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.quick-chip-btn:hover {
-  background: var(--ios-fill);
-}
-
-.quick-chip-btn:active {
-  transform: scale(0.94);
-}
-
-.chip-reset {
-  color: var(--ios-red);
-  background: rgba(255, 69, 58, 0.1);
-  border-color: rgba(255, 69, 58, 0.2);
-}
-
-.chip-reset:hover {
-  background: rgba(255, 69, 58, 0.18);
+.numpad-key-spacer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* 1-Row Compact Category Strip */

@@ -223,9 +223,6 @@ const typeExpenseBtnEl = document.getElementById('type-expense-btn');
 const typeIncomeBtnEl = document.getElementById('type-income-btn');
 const addFormEl = document.getElementById('add-form');
 const numpadAmountValEl = document.getElementById('numpad-amount-value');
-const numpadSignIndicatorEl = document.getElementById('numpad-sign-indicator');
-const quickChipsRowEl = document.querySelector('.quick-chips-row');
-const quickChipResetBtnEl = document.getElementById('quick-chip-reset');
 const quickCategoryStripEl = document.getElementById('quick-category-strip');
 const touchNumpadGridEl = document.querySelector('.touch-numpad-grid');
 const submitBtnEl = document.getElementById('submit-btn');
@@ -281,21 +278,13 @@ function renderCategoryChips() {
 }
 
 function getNumpadAmountNumber() {
-  return parseFloat(state.numpadBuffer) || 0;
+  return parseInt(state.numpadBuffer, 10) || 0;
 }
 
 function updateNumpadDisplay() {
   if (!numpadAmountValEl) return;
-  const raw = state.numpadBuffer;
-
-  if (raw.includes('.')) {
-    const [intPart, decPart] = raw.split('.');
-    const formattedInt = (Number(intPart) || 0).toLocaleString('ru-RU');
-    numpadAmountValEl.textContent = `${formattedInt}.${decPart}`;
-  } else {
-    const num = Number(raw) || 0;
-    numpadAmountValEl.textContent = num.toLocaleString('ru-RU');
-  }
+  const num = parseInt(state.numpadBuffer, 10) || 0;
+  numpadAmountValEl.textContent = num.toLocaleString('ru-RU');
 
   const amountNum = getNumpadAmountNumber();
   const isIncome = state.sheetType === 'income';
@@ -318,43 +307,18 @@ function handleNumpadKey(key) {
       state.numpadBuffer = '0';
     } else {
       state.numpadBuffer = state.numpadBuffer.slice(0, -1);
-      if (state.numpadBuffer === '' || state.numpadBuffer === '-') {
+      if (state.numpadBuffer === '') {
         state.numpadBuffer = '0';
       }
-    }
-  } else if (key === '.') {
-    if (!state.numpadBuffer.includes('.')) {
-      state.numpadBuffer += '.';
     }
   } else if (key >= '0' && key <= '9') {
     if (state.numpadBuffer === '0') {
       state.numpadBuffer = key;
     } else if (state.numpadBuffer.length < 9) {
-      if (state.numpadBuffer.includes('.')) {
-        const parts = state.numpadBuffer.split('.');
-        if (parts[1].length < 2) {
-          state.numpadBuffer += key;
-        }
-      } else {
-        state.numpadBuffer += key;
-      }
+      state.numpadBuffer += key;
     }
   }
   triggerHaptic('light');
-  updateNumpadDisplay();
-}
-
-function handleQuickChip(amountToAdd) {
-  const current = getNumpadAmountNumber();
-  const next = Math.round(current + amountToAdd);
-  state.numpadBuffer = String(next);
-  triggerHaptic('selection');
-  updateNumpadDisplay();
-}
-
-function resetNumpadAmount() {
-  state.numpadBuffer = '0';
-  triggerHaptic('warning');
   updateNumpadDisplay();
 }
 
@@ -715,19 +679,11 @@ function setSheetType(type) {
     typeExpenseBtnEl.classList.remove('active');
     typeIncomeBtnEl.setAttribute('aria-selected', 'true');
     typeExpenseBtnEl.setAttribute('aria-selected', 'false');
-    if (numpadSignIndicatorEl) {
-      numpadSignIndicatorEl.textContent = '+';
-      numpadSignIndicatorEl.classList.add('is-income');
-    }
   } else {
     typeExpenseBtnEl.classList.add('active');
     typeIncomeBtnEl.classList.remove('active');
     typeExpenseBtnEl.setAttribute('aria-selected', 'true');
     typeIncomeBtnEl.setAttribute('aria-selected', 'false');
-    if (numpadSignIndicatorEl) {
-      numpadSignIndicatorEl.textContent = '−';
-      numpadSignIndicatorEl.classList.remove('is-income');
-    }
   }
 
   renderQuickCategoryStrip();
@@ -1021,21 +977,6 @@ function setupEventListeners() {
     });
   }
 
-  // Быстрые чипы сумм (+100, +500, +1 000, +5 000)
-  if (quickChipsRowEl) {
-    quickChipsRowEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('button[data-add]');
-      if (btn) {
-        handleQuickChip(Number(btn.dataset.add));
-      }
-    });
-  }
-
-  // Сброс суммы
-  if (quickChipResetBtnEl) {
-    quickChipResetBtnEl.addEventListener('click', resetNumpadAmount);
-  }
-
   // Нажатия клавиш цифровой клавиатуры (Numpad 3x4)
   if (touchNumpadGridEl) {
     touchNumpadGridEl.addEventListener('click', (e) => {
@@ -1050,8 +991,6 @@ function setupEventListeners() {
     if (bottomSheetEl.classList.contains('hidden')) return;
     if (e.key >= '0' && e.key <= '9') {
       handleNumpadKey(e.key);
-    } else if (e.key === '.' || e.key === ',') {
-      handleNumpadKey('.');
     } else if (e.key === 'Backspace') {
       handleNumpadKey('del');
     } else if (e.key === 'Enter') {

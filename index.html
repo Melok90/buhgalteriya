@@ -168,19 +168,9 @@
         <!-- Large Amount Display -->
         <div class="numpad-amount-container">
           <div class="numpad-amount-row">
-            <span id="numpad-sign-indicator" class="numpad-sign-indicator">−</span>
             <span id="numpad-amount-value" class="numpad-amount-value num-tabular">0</span>
             <span class="numpad-currency">₽</span>
           </div>
-        </div>
-
-        <!-- Quick Amount Chips -->
-        <div class="quick-chips-row" role="group" aria-label="Быстрое добавление суммы">
-          <button type="button" class="quick-chip-btn" data-add="100">+100</button>
-          <button type="button" class="quick-chip-btn" data-add="500">+500</button>
-          <button type="button" class="quick-chip-btn" data-add="1000">+1 000</button>
-          <button type="button" class="quick-chip-btn" data-add="5000">+5 000</button>
-          <button type="button" id="quick-chip-reset" class="quick-chip-btn chip-reset" title="Сбросить сумму">Сброс</button>
         </div>
 
         <!-- 1-Row Compact Category Strip -->
@@ -201,7 +191,7 @@
           <button type="button" class="numpad-key" data-key="7">7</button>
           <button type="button" class="numpad-key" data-key="8">8</button>
           <button type="button" class="numpad-key" data-key="9">9</button>
-          <button type="button" class="numpad-key" data-key=".">.</button>
+          <div class="numpad-key-spacer" aria-hidden="true"></div>
           <button type="button" class="numpad-key" data-key="0">0</button>
           <button type="button" class="numpad-key key-delete" data-key="del" aria-label="Удалить последний символ">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
