@@ -1359,6 +1359,17 @@ function init() {
   renderSelectedCategoryCard();
   renderApp();
   setupEventListeners();
+
+  // Поддержка быстрых ссылок (deep links / PWA shortcuts)
+  if (typeof window !== 'undefined' && window.location && window.location.hash) {
+    if (window.location.hash === '#add') {
+      openBottomSheet('expense');
+    } else if (window.location.hash === '#income') {
+      openBottomSheet('income');
+    } else if (window.location.hash === '#analytics') {
+      openAnalyticsSheet();
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

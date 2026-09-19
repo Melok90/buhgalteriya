@@ -851,6 +851,27 @@ body {
   margin-bottom: 8px;
 }
 
+/* Centered Header for Add Sheet with Segmented Switcher & Top-Right Close Button */
+.sheet-header-segmented {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.sheet-header-segmented .sheet-close-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  z-index: 2;
+}
+
 .sheet-title {
   font-size: 20px;
   font-weight: 700;
@@ -1300,10 +1321,12 @@ body {
    ========================================================================== */
 .sheet-type-segmented {
   display: inline-flex;
-  background-color: rgba(120, 120, 128, 0.24);
-  border-radius: 9px;
-  padding: 2px;
-  gap: 2px;
+  align-items: center;
+  background-color: rgba(120, 120, 128, 0.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 3px;
+  gap: 3px;
 }
 
 .sheet-type-btn {
@@ -1311,18 +1334,69 @@ body {
   border: none;
   color: var(--ios-label-secondary);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 7px;
+  letter-spacing: -0.01em;
+  padding: 8px 16px;
+  min-height: 38px;
+  border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.2s var(--ios-spring);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.22s var(--ios-spring);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.sheet-type-btn:not(.active):hover {
+  color: var(--ios-label);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sheet-type-btn:active {
+  transform: scale(0.95);
 }
 
 .sheet-type-btn.active {
-  background-color: #636366;
+  background-color: #38383a;
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), inset 0 0.5px 0 rgba(255, 255, 255, 0.16);
+}
+
+/* Small icons: Red minus for Expense, Green plus for Income */
+.sheet-type-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sheet-type-icon.expense-badge {
+  background-color: rgba(255, 69, 58, 0.18);
+  color: #ff453a;
+}
+
+.sheet-type-icon.income-badge {
+  background-color: rgba(48, 209, 88, 0.18);
+  color: #30d158;
+}
+
+.sheet-type-btn.active .sheet-type-icon.expense-badge {
+  background-color: #ff453a;
+  color: #ffffff;
+  box-shadow: 0 1px 6px rgba(255, 69, 58, 0.45);
+}
+
+.sheet-type-btn.active .sheet-type-icon.income-badge {
+  background-color: #30d158;
+  color: #ffffff;
+  box-shadow: 0 1px 6px rgba(48, 209, 88, 0.45);
 }
 
 /* Income Transaction Styles */
