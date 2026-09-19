@@ -416,6 +416,59 @@ function togglePrivacy() {
   renderApp();
 }
 
+// --- 5.1 Вспомогательные функции для дат и группировки ---
+function getDateKey(dateInput) {
+  if (!dateInput) return 'unknown';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return 'unknown';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatGroupDateTitle(dateKey) {
+  if (dateKey === 'unknown') return 'Ранее';
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const txDate = new Date(y, m - 1, d);
+  
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((today - txDate) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Сегодня';
+  if (diffDays === 1) return 'Вчера';
+
+  const options = { day: 'numeric', month: 'long' };
+  if (y !== now.getFullYear()) {
+    options.year = 'numeric';
+  }
+  return txDate.toLocaleDateString('ru-RU', options);
+}
+
+function groupTransactionsByDate(txList) {
+  const groups = new Map();
+
+  txList.forEach(tx => {
+    const key = getDateKey(tx.date);
+    if (!groups.has(key)) {
+      groups.set(key, {
+        dateKey: key,
+        title: formatGroupDateTitle(key),
+        total: 0,
+        items: []
+      });
+    }
+    const group = groups.get(key);
+    group.items.push(tx);
+    if (tx.type !== 'income') {
+      group.total += Number(tx.amount) || 0;
+    }
+  });
+
+  return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+}
+
 function renderApp() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -477,60 +530,6 @@ function renderApp() {
       (tx.place && tx.place.toLowerCase().includes(q));
     return matchesCat && matchesText;
   });
-
-// --- 5.1 Вспомогательные функции для дат и группировки ---
-function getDateKey(dateInput) {
-  if (!dateInput) return 'unknown';
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return 'unknown';
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function formatGroupDateTitle(dateKey) {
-  if (dateKey === 'unknown') return 'Ранее';
-  const [y, m, d] = dateKey.split('-').map(Number);
-  const txDate = new Date(y, m - 1, d);
-  
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const target = new Date(y, m - 1, d);
-  const diffDays = Math.round((today - target) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return 'Сегодня';
-  if (diffDays === 1) return 'Вчера';
-
-  const options = { day: 'numeric', month: 'long' };
-  if (y !== now.getFullYear()) {
-    options.year = 'numeric';
-  }
-  return txDate.toLocaleDateString('ru-RU', options);
-}
-
-function groupTransactionsByDate(txList) {
-  const groups = new Map();
-
-  txList.forEach(tx => {
-    const key = getDateKey(tx.date);
-    if (!groups.has(key)) {
-      groups.set(key, {
-        dateKey: key,
-        title: formatGroupDateTitle(key),
-        total: 0,
-        items: []
-      });
-    }
-    const group = groups.get(key);
-    group.items.push(tx);
-    if (tx.type !== 'income') {
-      group.total += Number(tx.amount) || 0;
-    }
-  });
-
-  return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
-}
 
   txCountBadgeEl.textContent = `${filtered.length} ${getNounPlural(filtered.length, 'запись', 'записи', 'записей')}`;
 
@@ -1164,7 +1163,7 @@ function setupEventListeners() {
 function init() {
   loadState();
   renderCategoryChips();
-  renderCategoryPicker();
+  renderQuickCategoryStrip();
   renderApp();
   setupEventListeners();
 }
