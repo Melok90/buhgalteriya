@@ -859,28 +859,30 @@ body {
   gap: 18px;
 }
 
-/* Amount Input Group (Prominent Headline, Centered, No desktop arrows) */
-.amount-input-group {
+/* ==========================================================================
+   Quick Calculator Numpad Form (Revolut / Apple Cash Style)
+   ========================================================================== */
+.numpad-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Large Display */
+.numpad-amount-container {
   text-align: center;
   padding: 4px 0 2px 0;
 }
 
-.amount-input-row {
+.numpad-amount-row {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   gap: 6px;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
-  padding: 0 16px 8px 16px;
-  transition: border-color 0.2s ease;
 }
 
-.amount-input-row:focus-within {
-  border-bottom-color: #ffffff;
-}
-
-.amount-sign-indicator {
-  font-size: 34px;
+.numpad-sign-indicator {
+  font-size: 38px;
   font-weight: 700;
   color: var(--ios-label-secondary);
   line-height: 1;
@@ -888,282 +890,193 @@ body {
   user-select: none;
 }
 
-.amount-sign-indicator.is-income {
+.numpad-sign-indicator.is-income {
   color: var(--ios-green);
 }
 
-.amount-field {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: inherit;
-  font-size: 44px;
+.numpad-amount-value {
+  font-size: 46px;
   font-weight: 800;
   color: var(--ios-label);
-  text-align: center;
-  width: 170px;
-  caret-color: var(--ios-accent);
-  padding: 0;
-  -moz-appearance: textfield;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  min-width: 30px;
 }
 
-.amount-field::-webkit-outer-spin-button,
-.amount-field::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.amount-field::placeholder {
-  color: rgba(255, 255, 255, 0.22);
-}
-
-.currency-symbol {
+.numpad-currency {
   font-size: 26px;
   font-weight: 700;
   color: var(--ios-label-secondary);
   user-select: none;
 }
 
-.amount-hint {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ios-label-tertiary);
-  margin-top: 6px;
-}
-
-/* Category Grid (4x2 Compact, All Visible, Required) */
-.category-section {
+/* Quick Amount Chips (+100, +500, +1000, +5000, Reset) */
+.quick-chips-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.category-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 2px;
-}
-
-.field-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ios-label-tertiary);
-}
-
-.required-star {
-  color: var(--ios-red);
-}
-
-.selected-cat-indicator {
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 2px 10px;
-  border-radius: 9999px;
-  letter-spacing: -0.01em;
-}
-
-.category-grid-picker {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.cat-picker-item {
-  position: relative;
-  background-color: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 8px 4px;
-  height: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: all 0.18s var(--ios-spring);
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0 4px;
+}
+
+.quick-chip-btn {
+  background: var(--ios-fill-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: var(--ios-label);
   font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
   user-select: none;
 }
 
-.cat-picker-item:hover {
-  background-color: var(--ios-fill);
+.quick-chip-btn:hover {
+  background: var(--ios-fill);
 }
 
-.cat-picker-item:active {
-  transform: scale(0.96);
+.quick-chip-btn:active {
+  transform: scale(0.94);
 }
 
-.cat-picker-item.selected {
-  background-color: #ffffff;
+.chip-reset {
+  color: var(--ios-red);
+  background: rgba(255, 69, 58, 0.1);
+  border-color: rgba(255, 69, 58, 0.2);
+}
+
+.chip-reset:hover {
+  background: rgba(255, 69, 58, 0.18);
+}
+
+/* 1-Row Compact Category Strip */
+.quick-category-section {
+  width: 100%;
+  overflow: hidden;
+  padding: 2px 0;
+}
+
+.quick-category-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 4px 4px 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-category-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ios-fill-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  color: var(--ios-label-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.16s var(--ios-spring);
+  user-select: none;
+}
+
+.quick-cat-pill:hover {
+  background: var(--ios-fill);
+  color: var(--ios-label);
+}
+
+.quick-cat-pill:active {
+  transform: scale(0.95);
+}
+
+.quick-cat-pill.selected {
+  background: #ffffff;
+  color: #000000;
   border-color: #ffffff;
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.22);
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.22);
 }
 
-.cat-picker-icon-badge {
-  width: 24px;
-  height: 24px;
+.quick-cat-pill-icon {
+  width: 14px;
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--cat-color, #ffffff);
-  transition: color 0.18s ease, transform 0.18s ease;
 }
 
-.cat-picker-icon-badge svg {
-  width: 20px;
-  height: 20px;
+.quick-cat-pill-icon svg {
+  width: 14px;
+  height: 14px;
 }
 
-.cat-picker-item.selected .cat-picker-icon-badge {
+.quick-cat-pill.selected .quick-cat-pill-icon {
   color: #000000;
-  transform: scale(1.05);
 }
 
-.cat-picker-name {
-  font-size: 11px;
+.quick-cat-pill.selected .quick-cat-pill-icon svg {
+  stroke: #000000;
+}
+
+/* Large Touch Numpad (3x4) */
+.touch-numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 360px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.numpad-key {
+  background-color: var(--ios-fill-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  color: var(--ios-label);
+  font-family: inherit;
+  font-size: 24px;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ios-label-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  padding: 0 2px;
-}
-
-.cat-picker-item.selected .cat-picker-name {
-  color: #000000;
-  font-weight: 700;
-}
-
-/* Optional & Date Inset Grouped Card (Apple Native Style) */
-.inset-form-card {
-  background-color: var(--ios-bg-card);
+  height: 52px;
   border-radius: 14px;
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.inset-form-row {
-  display: flex;
-  align-items: center;
-  padding: 11px 14px;
-  position: relative;
-  min-height: 44px;
-}
-
-.inset-form-row:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 14px;
-  right: 0;
-  height: 0.5px;
-  background-color: rgba(255, 255, 255, 0.08);
-  pointer-events: none;
-}
-
-.inset-row-label {
-  width: 80px;
-  flex-shrink: 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ios-label-secondary);
-}
-
-.inset-row-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--ios-label);
-  padding: 0;
-}
-
-.inset-row-input::placeholder {
-  color: var(--ios-label-tertiary);
-}
-
-/* Date row & presets */
-.inset-date-row {
-  justify-content: space-between;
-}
-
-.date-quick-presets {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.date-preset-btn {
-  background: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  color: var(--ios-label-secondary);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 5px 11px;
-  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.date-preset-btn:hover {
-  background: var(--ios-fill);
-  color: var(--ios-label);
-}
-
-.date-preset-btn.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
-  font-weight: 700;
-}
-
-.date-picker-label {
-  position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  color: var(--ios-label-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.12s var(--ios-spring);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.date-picker-label:hover {
-  background: var(--ios-fill);
-  color: var(--ios-label);
+.numpad-key:hover {
+  background-color: var(--ios-fill);
 }
 
-.date-picker-label.active {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+.numpad-key:active,
+.numpad-key.is-pressed {
+  background-color: rgba(255, 255, 255, 0.22);
+  transform: scale(0.94);
 }
 
-.date-native-input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+.key-delete {
+  color: var(--ios-red);
+}
+
+.key-delete:hover {
+  background-color: rgba(255, 69, 58, 0.15);
+}
+
+.key-delete:active,
+.key-delete.is-pressed {
+  background-color: rgba(255, 69, 58, 0.28);
 }
 
 /* Primary Submit Action (Apple Prominent Action) */

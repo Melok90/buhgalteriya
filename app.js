@@ -137,7 +137,8 @@ let state = {
   selectedCatForNew: 'food',
   selectedIncomeCatForNew: 'salary',
   isPrivate: localStorage.getItem(PRIVACY_KEY) === 'true',
-  sheetType: 'expense'
+  sheetType: 'expense',
+  numpadBuffer: '0'
 };
 
 function loadState() {
@@ -220,20 +221,13 @@ const sheetCloseBtnEl = document.getElementById('sheet-close-btn');
 const sheetHandleWrapperEl = document.getElementById('sheet-handle-wrapper');
 const typeExpenseBtnEl = document.getElementById('type-expense-btn');
 const typeIncomeBtnEl = document.getElementById('type-income-btn');
-const categoryPickerGroupEl = document.getElementById('category-picker-group');
-const selectedCatLabelEl = document.getElementById('selected-cat-label');
 const addFormEl = document.getElementById('add-form');
-const amountInputEl = document.getElementById('amount-input');
-const amountSignIndicatorEl = document.getElementById('amount-sign-indicator');
-const amountHintEl = document.getElementById('amount-hint');
-const commentInputEl = document.getElementById('comment-input');
-const placeInputEl = document.getElementById('place-input');
-const dateInputEl = document.getElementById('date-input');
-const dateBtnTodayEl = document.getElementById('date-btn-today');
-const dateBtnYesterdayEl = document.getElementById('date-btn-yesterday');
-const dateCustomLabelEl = document.getElementById('date-custom-label');
-const customDateTextEl = document.getElementById('custom-date-text');
-const catPickerContainerEl = document.getElementById('category-picker');
+const numpadAmountValEl = document.getElementById('numpad-amount-value');
+const numpadSignIndicatorEl = document.getElementById('numpad-sign-indicator');
+const quickChipsRowEl = document.querySelector('.quick-chips-row');
+const quickChipResetBtnEl = document.getElementById('quick-chip-reset');
+const quickCategoryStripEl = document.getElementById('quick-category-strip');
+const touchNumpadGridEl = document.querySelector('.touch-numpad-grid');
 const submitBtnEl = document.getElementById('submit-btn');
 const resetBtnEl = document.getElementById('reset-btn');
 
@@ -286,7 +280,86 @@ function renderCategoryChips() {
   }).join('');
 }
 
-function renderCategoryPicker() {
+function getNumpadAmountNumber() {
+  return parseFloat(state.numpadBuffer) || 0;
+}
+
+function updateNumpadDisplay() {
+  if (!numpadAmountValEl) return;
+  const raw = state.numpadBuffer;
+
+  if (raw.includes('.')) {
+    const [intPart, decPart] = raw.split('.');
+    const formattedInt = (Number(intPart) || 0).toLocaleString('ru-RU');
+    numpadAmountValEl.textContent = `${formattedInt}.${decPart}`;
+  } else {
+    const num = Number(raw) || 0;
+    numpadAmountValEl.textContent = num.toLocaleString('ru-RU');
+  }
+
+  const amountNum = getNumpadAmountNumber();
+  const isIncome = state.sheetType === 'income';
+
+  if (submitBtnEl) {
+    submitBtnEl.disabled = amountNum <= 0;
+    if (amountNum > 0) {
+      submitBtnEl.textContent = isIncome
+        ? `Пополнить ${formatRub(amountNum)}`
+        : `Добавить расход ${formatRub(amountNum)}`;
+    } else {
+      submitBtnEl.textContent = isIncome ? 'Пополнить баланс' : 'Добавить расход';
+    }
+  }
+}
+
+function handleNumpadKey(key) {
+  if (key === 'del') {
+    if (state.numpadBuffer.length <= 1) {
+      state.numpadBuffer = '0';
+    } else {
+      state.numpadBuffer = state.numpadBuffer.slice(0, -1);
+      if (state.numpadBuffer === '' || state.numpadBuffer === '-') {
+        state.numpadBuffer = '0';
+      }
+    }
+  } else if (key === '.') {
+    if (!state.numpadBuffer.includes('.')) {
+      state.numpadBuffer += '.';
+    }
+  } else if (key >= '0' && key <= '9') {
+    if (state.numpadBuffer === '0') {
+      state.numpadBuffer = key;
+    } else if (state.numpadBuffer.length < 9) {
+      if (state.numpadBuffer.includes('.')) {
+        const parts = state.numpadBuffer.split('.');
+        if (parts[1].length < 2) {
+          state.numpadBuffer += key;
+        }
+      } else {
+        state.numpadBuffer += key;
+      }
+    }
+  }
+  triggerHaptic('light');
+  updateNumpadDisplay();
+}
+
+function handleQuickChip(amountToAdd) {
+  const current = getNumpadAmountNumber();
+  const next = Math.round(current + amountToAdd);
+  state.numpadBuffer = String(next);
+  triggerHaptic('selection');
+  updateNumpadDisplay();
+}
+
+function resetNumpadAmount() {
+  state.numpadBuffer = '0';
+  triggerHaptic('warning');
+  updateNumpadDisplay();
+}
+
+function renderQuickCategoryStrip() {
+  if (!quickCategoryStripEl) return;
   const isIncome = state.sheetType === 'income';
   const cats = isIncome ? INCOME_CATEGORIES : CATEGORIES.filter(c => c.id !== 'all');
   const currentCatId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
@@ -298,46 +371,23 @@ function renderCategoryPicker() {
     else state.selectedCatForNew = activeCat.id;
   }
 
-  if (selectedCatLabelEl) {
-    selectedCatLabelEl.textContent = activeCat.name;
-  }
-
-  if (commentInputEl) {
-    commentInputEl.placeholder = `По умолчанию: ${activeCat.name}`;
-  }
-
-  catPickerContainerEl.innerHTML = cats.map(cat => {
+  quickCategoryStripEl.innerHTML = cats.map(cat => {
     const isSelected = cat.id === activeCat.id;
     return `
       <button 
         type="button" 
-        data-picker-id="${cat.id}" 
-        class="cat-picker-item ${isSelected ? 'selected' : ''}"
+        data-strip-cat="${cat.id}" 
+        class="quick-cat-pill ${isSelected ? 'selected' : ''}"
         role="radio"
         aria-checked="${isSelected}"
-        style="--cat-color: ${cat.hex}"
       >
-        <div class="cat-picker-icon-badge">
+        <span class="quick-cat-pill-icon" style="--cat-color: ${cat.hex}">
           ${cat.icon}
-        </div>
-        <span class="cat-picker-name">${cat.name}</span>
+        </span>
+        <span>${cat.name}</span>
       </button>
     `;
   }).join('');
-}
-
-function validateAddForm() {
-  const amountVal = parseFloat(amountInputEl ? amountInputEl.value : '0');
-  const hasValidAmount = !isNaN(amountVal) && amountVal > 0;
-  const isIncome = state.sheetType === 'income';
-  const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
-  const hasCategory = Boolean(catId);
-  const hasDate = Boolean(dateInputEl && dateInputEl.value);
-
-  const isValid = hasValidAmount && hasCategory && hasDate;
-  if (submitBtnEl) {
-    submitBtnEl.disabled = !isValid;
-  }
 }
 
 function renderPrivacyIcon() {
@@ -657,49 +707,6 @@ document.addEventListener('click', (e) => {
 let sheetStartY = 0;
 let isDraggingSheet = false;
 
-function setSheetDate(presetOrDate) {
-  const today = new Date();
-  let targetDate;
-
-  if (presetOrDate === 'today') {
-    targetDate = today;
-    if (dateBtnTodayEl) dateBtnTodayEl.classList.add('active');
-    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.remove('active');
-    if (dateCustomLabelEl) dateCustomLabelEl.classList.remove('active');
-    if (customDateTextEl) customDateTextEl.textContent = '📅';
-  } else if (presetOrDate === 'yesterday') {
-    targetDate = new Date(today);
-    targetDate.setDate(today.getDate() - 1);
-    if (dateBtnTodayEl) dateBtnTodayEl.classList.remove('active');
-    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.add('active');
-    if (dateCustomLabelEl) dateCustomLabelEl.classList.remove('active');
-    if (customDateTextEl) customDateTextEl.textContent = '📅';
-  } else {
-    // Custom date string: YYYY-MM-DD
-    const parts = String(presetOrDate).split('-');
-    if (parts.length === 3) {
-      targetDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-    } else {
-      targetDate = new Date(presetOrDate);
-    }
-    if (dateBtnTodayEl) dateBtnTodayEl.classList.remove('active');
-    if (dateBtnYesterdayEl) dateBtnYesterdayEl.classList.remove('active');
-    if (dateCustomLabelEl) dateCustomLabelEl.classList.add('active');
-    const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    if (customDateTextEl && !isNaN(targetDate.getTime())) {
-      customDateTextEl.textContent = `${targetDate.getDate()} ${months[targetDate.getMonth()]}`;
-    }
-  }
-
-  const yyyy = targetDate.getFullYear();
-  const mm = String(targetDate.getMonth() + 1).padStart(2, '0');
-  const dd = String(targetDate.getDate()).padStart(2, '0');
-  if (dateInputEl) {
-    dateInputEl.value = `${yyyy}-${mm}-${dd}`;
-  }
-  validateAddForm();
-}
-
 function setSheetType(type) {
   state.sheetType = type;
   const isIncome = type === 'income';
@@ -709,43 +716,33 @@ function setSheetType(type) {
     typeExpenseBtnEl.classList.remove('active');
     typeIncomeBtnEl.setAttribute('aria-selected', 'true');
     typeExpenseBtnEl.setAttribute('aria-selected', 'false');
-    if (amountSignIndicatorEl) {
-      amountSignIndicatorEl.textContent = '+';
-      amountSignIndicatorEl.classList.add('is-income');
+    if (numpadSignIndicatorEl) {
+      numpadSignIndicatorEl.textContent = '+';
+      numpadSignIndicatorEl.classList.add('is-income');
     }
-    amountHintEl.textContent = 'Введите сумму пополнения';
-    placeInputEl.placeholder = 'Источник / Банк';
-    submitBtnEl.textContent = 'Пополнить баланс';
   } else {
     typeExpenseBtnEl.classList.add('active');
     typeIncomeBtnEl.classList.remove('active');
     typeExpenseBtnEl.setAttribute('aria-selected', 'true');
     typeIncomeBtnEl.setAttribute('aria-selected', 'false');
-    if (amountSignIndicatorEl) {
-      amountSignIndicatorEl.textContent = '−';
-      amountSignIndicatorEl.classList.remove('is-income');
+    if (numpadSignIndicatorEl) {
+      numpadSignIndicatorEl.textContent = '−';
+      numpadSignIndicatorEl.classList.remove('is-income');
     }
-    amountHintEl.textContent = 'Введите сумму расхода';
-    placeInputEl.placeholder = 'Магазин или сервис';
-    submitBtnEl.textContent = 'Сохранить расход';
   }
 
-  renderCategoryPicker();
-  validateAddForm();
+  renderQuickCategoryStrip();
+  updateNumpadDisplay();
 }
 
 function openBottomSheet(type = 'expense') {
   triggerHaptic('medium');
+  state.numpadBuffer = '0';
   setSheetType(type);
   sheetBackdropEl.classList.remove('hidden');
   bottomSheetEl.classList.remove('hidden');
   bottomSheetEl.style.transform = '';
-  setSheetDate('today');
-  amountInputEl.value = '';
-  commentInputEl.value = '';
-  placeInputEl.value = '';
-  validateAddForm();
-  setTimeout(() => amountInputEl.focus(), 200);
+  updateNumpadDisplay();
 }
 
 function closeBottomSheet() {
@@ -759,11 +756,8 @@ function closeBottomSheet() {
     bottomSheetEl.classList.add('hidden');
     bottomSheetEl.style.transform = '';
     sheetBackdropEl.style.opacity = '';
-    amountInputEl.value = '';
-    commentInputEl.value = '';
-    placeInputEl.value = '';
-    setSheetDate('today');
-    validateAddForm();
+    state.numpadBuffer = '0';
+    updateNumpadDisplay();
   }, 250);
 }
 
@@ -1013,56 +1007,70 @@ function setupEventListeners() {
     analyticsBackdropEl.addEventListener('click', closeAnalyticsSheet);
   }
 
-  // Выбор категории внутри шторки
-  catPickerContainerEl.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-picker-id]');
-    if (!btn) return;
-    triggerHaptic('selection');
-    if (state.sheetType === 'income') {
-      state.selectedIncomeCatForNew = btn.dataset.pickerId;
-    } else {
-      state.selectedCatForNew = btn.dataset.pickerId;
-    }
-    renderCategoryPicker();
-    validateAddForm();
-  });
-
-  // Живая валидация суммы (кнопка сохранения активируется при сумме > 0)
-  amountInputEl.addEventListener('input', () => {
-    validateAddForm();
-  });
-
-  // Быстрые пресеты даты
-  if (dateBtnTodayEl) {
-    dateBtnTodayEl.addEventListener('click', () => {
+  // Выбор категории внутри быстрой полоски
+  if (quickCategoryStripEl) {
+    quickCategoryStripEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-strip-cat]');
+      if (!btn) return;
       triggerHaptic('selection');
-      setSheetDate('today');
+      if (state.sheetType === 'income') {
+        state.selectedIncomeCatForNew = btn.dataset.stripCat;
+      } else {
+        state.selectedCatForNew = btn.dataset.stripCat;
+      }
+      renderQuickCategoryStrip();
     });
   }
 
-  if (dateBtnYesterdayEl) {
-    dateBtnYesterdayEl.addEventListener('click', () => {
-      triggerHaptic('selection');
-      setSheetDate('yesterday');
-    });
-  }
-
-  if (dateInputEl) {
-    dateInputEl.addEventListener('change', (e) => {
-      if (e.target.value) {
-        triggerHaptic('selection');
-        setSheetDate(e.target.value);
+  // Быстрые чипы сумм (+100, +500, +1 000, +5 000)
+  if (quickChipsRowEl) {
+    quickChipsRowEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-add]');
+      if (btn) {
+        handleQuickChip(Number(btn.dataset.add));
       }
     });
   }
 
+  // Сброс суммы
+  if (quickChipResetBtnEl) {
+    quickChipResetBtnEl.addEventListener('click', resetNumpadAmount);
+  }
+
+  // Нажатия клавиш цифровой клавиатуры (Numpad 3x4)
+  if (touchNumpadGridEl) {
+    touchNumpadGridEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-key]');
+      if (!btn) return;
+      handleNumpadKey(btn.dataset.key);
+    });
+  }
+
+  // Поддержка физической клавиатуры с ПК
+  window.addEventListener('keydown', (e) => {
+    if (bottomSheetEl.classList.contains('hidden')) return;
+    if (e.key >= '0' && e.key <= '9') {
+      handleNumpadKey(e.key);
+    } else if (e.key === '.' || e.key === ',') {
+      handleNumpadKey('.');
+    } else if (e.key === 'Backspace') {
+      handleNumpadKey('del');
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (getNumpadAmountNumber() > 0) {
+        addFormEl.dispatchEvent(new Event('submit'));
+      }
+    } else if (e.key === 'Escape') {
+      closeBottomSheet();
+    }
+  });
+
   // Отправка формы (Расход или Пополнение)
   addFormEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    const amountNum = parseFloat(amountInputEl.value);
+    const amountNum = getNumpadAmountNumber();
     if (!amountNum || isNaN(amountNum) || amountNum <= 0) {
       triggerHaptic('warning');
-      amountInputEl.focus();
       return;
     }
 
@@ -1071,28 +1079,14 @@ function setupEventListeners() {
     const catId = isIncome ? state.selectedIncomeCatForNew : state.selectedCatForNew;
     const selectedCat = catList.find(c => c.id === catId) || catList[0];
 
-    // Если заметка не введена — по умолчанию название выбранной категории
-    const comment = commentInputEl.value.trim() || selectedCat.name;
-    // Место опционально
-    const place = placeInputEl.value.trim() || '';
-
-    // Корректная дата с сохранением локального дня
-    let dateVal = new Date().toISOString();
-    if (dateInputEl && dateInputEl.value) {
-      const parts = dateInputEl.value.split('-').map(Number);
-      if (parts.length === 3) {
-        dateVal = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0).toISOString();
-      }
-    }
-
     const newTx = {
       id: Date.now(),
       type: isIncome ? 'income' : 'expense',
       categoryId: selectedCat.id,
       amount: amountNum,
-      comment: comment,
-      place: place,
-      date: dateVal
+      comment: selectedCat.name,
+      place: '',
+      date: new Date().toISOString()
     };
 
     state.transactions.unshift(newTx);
