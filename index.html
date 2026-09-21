@@ -62,10 +62,12 @@
         </button>
       </div>
 
-      <!-- Segmented Category Filters -->
-      <nav id="categories-filter" class="categories-filter" aria-label="Фильтр по категориям">
-        <!-- Rendered by JavaScript -->
-      </nav>
+      <!-- Progressive Disclosure Category Filters (Collapsible) -->
+      <div id="search-tags-container" class="search-tags-container" aria-hidden="true">
+        <nav id="categories-filter" class="categories-filter" aria-label="Фильтр по категориям">
+          <!-- Rendered by JavaScript -->
+        </nav>
+      </div>
     </header>
 
     <!-- Main Scrollable Content -->
@@ -108,6 +110,19 @@
             <span class="context-label">В день</span>
             <span class="context-value num-tabular" id="daily-avg-amount">~0 ₽</span>
           </div>
+        </div>
+      </section>
+
+      <!-- Expense Structure Card (Horizontal Stacked Bar & 2-Col Breakdown) -->
+      <section id="expense-structure-card" class="expense-structure-card">
+        <div class="expense-structure-header">
+          <h2 class="expense-structure-title">Структура расходов</h2>
+        </div>
+        <div id="expense-stacked-bar" class="expense-stacked-bar" role="progressbar" aria-label="Структура расходов по категориям">
+          <!-- Rendered dynamically by JavaScript -->
+        </div>
+        <div id="expense-categories-grid" class="expense-categories-grid">
+          <!-- Rendered dynamically by JavaScript -->
         </div>
       </section>
 

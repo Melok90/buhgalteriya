@@ -178,7 +178,7 @@ body {
 }
 
 /* ==========================================================================
-   iOS Search Bar
+   iOS Search Bar & Progressive Disclosure Tags
    ========================================================================== */
 .search-wrapper {
   position: relative;
@@ -203,26 +203,29 @@ body {
   border: 0.5px solid rgba(255, 255, 255, 0.08);
   color: var(--ios-label);
   font-family: inherit;
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 400;
-  padding: 12px 44px 12px 42px;
-  min-height: 44px;
+  padding: 11px 44px 11px 40px;
+  min-height: 42px;
   border-radius: var(--ios-radius-input);
   outline: none;
-  transition: all 0.2s var(--ios-ease);
+  transition: border-color 0.2s var(--ios-ease), box-shadow 0.2s var(--ios-ease), background-color 0.2s ease;
 }
 
 .search-input::placeholder {
   color: var(--ios-label-tertiary);
 }
 
-.search-input:focus {
-  background-color: var(--ios-fill);
-  border-color: rgba(255, 255, 255, 0.25);
+.search-input:focus,
+.search-wrapper.is-active .search-input {
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: #5e5ce6;
+  box-shadow: 0 0 0 1px #5e5ce6, 0 0 14px rgba(94, 92, 230, 0.35);
 }
 
-.search-wrapper:focus-within .search-icon {
-  color: var(--ios-label);
+.search-wrapper:focus-within .search-icon,
+.search-wrapper.is-active .search-icon {
+  color: #a5a3ff;
 }
 
 /* Search Clear Button with 44px hit target */
@@ -239,46 +242,65 @@ body {
   height: 44px;
   cursor: pointer;
   border-radius: 50%;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease;
 }
 
 .search-clear-btn:hover {
   color: var(--ios-label);
 }
 
-/* ==========================================================================
-   Category Chips Filter (Segmented Tag Style)
-   ========================================================================== */
+.search-clear-btn:active {
+  transform: scale(0.9);
+}
+
+/* Progressive Disclosure: Collapsible Category Chips Filter */
+.search-tags-container {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  margin-top: 0;
+  transition: max-height 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease, margin 0.22s ease;
+}
+
+.search-tags-container.is-open {
+  max-height: 220px;
+  opacity: 1;
+  pointer-events: auto;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
 .categories-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 2px;
+  gap: 7px;
+  padding: 4px 0 2px 0;
 }
 
 .chip {
-  background-color: rgba(255, 255, 255, 0.07);
-  color: var(--ios-label-secondary);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(235, 235, 245, 0.75);
   border: 0.5px solid rgba(255, 255, 255, 0.08);
-  padding: 0 11px;
-  min-height: 28px;
-  height: 28px;
+  padding: 0 12px;
+  min-height: 29px;
+  height: 29px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
   white-space: nowrap;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 .chip:hover {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.14);
   color: var(--ios-label);
 }
 
@@ -287,7 +309,7 @@ body {
   color: #ffffff;
   border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 2px 8px var(--ios-accent-glow);
+  box-shadow: 0 2px 10px var(--ios-accent-glow);
 }
 
 .chip:active {
@@ -295,29 +317,37 @@ body {
 }
 
 /* ==========================================================================
-   Scrollable Main Area
+   Scrollable Main Area (Smooth Natural Page Scroll)
    ========================================================================== */
 .main-scroll-area {
   flex: 1 1 0%;
   min-height: 0;
-  overflow: hidden;
-  padding: 12px 16px 0 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 84px) 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 13px;
+}
+
+.main-scroll-area::-webkit-scrollbar {
+  display: none;
 }
 
 /* ==========================================================================
-   Balance Card (Option 1: Apple Executive Minimal)
+   Balance Card (Compact Apple Executive Minimal)
    ========================================================================== */
 .balance-card {
-  background: linear-gradient(145deg, #1d1d20 0%, #151517 100%);
+  background: linear-gradient(145deg, #1c1c1f 0%, #131315 100%);
   border-radius: var(--ios-radius-card);
-  padding: 18px 18px 16px 18px;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 16px 13px 16px;
+  border: 0.5px solid rgba(255, 255, 255, 0.09);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s var(--ios-spring), box-shadow 0.2s ease;
   flex-shrink: 0;
 }
@@ -326,7 +356,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .balance-header-left {
@@ -340,7 +370,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background-color: var(--ios-green);
-  box-shadow: 0 0 6px rgba(48, 209, 88, 0.5);
+  box-shadow: 0 0 6px rgba(48, 209, 88, 0.6);
   flex-shrink: 0;
 }
 
@@ -356,6 +386,158 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* ==========================================================================
+   Expense Structure Card (Horizontal Stacked Bar & 2-Col Breakdown)
+   ========================================================================== */
+.expense-structure-card {
+  background: linear-gradient(145deg, #1c1c1f 0%, #131315 100%);
+  border-radius: var(--ios-radius-card);
+  padding: 15px 16px 15px 16px;
+  border: 0.5px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.expense-structure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.expense-structure-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ios-label);
+}
+
+/* Horizontal Stacked Bar */
+.expense-stacked-bar {
+  width: 100%;
+  height: 26px;
+  border-radius: 13px;
+  background-color: rgba(255, 255, 255, 0.06);
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.stacked-bar-segment {
+  height: 100%;
+  background-color: var(--cat-color, #bf5af2);
+  transition: width 0.35s var(--ios-spring), opacity 0.25s ease, filter 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.stacked-bar-segment:hover {
+  filter: brightness(1.15);
+}
+
+.stacked-bar-segment.is-dimmed {
+  opacity: 0.25;
+}
+
+.stacked-bar-segment.is-selected {
+  opacity: 1;
+  filter: brightness(1.25);
+  box-shadow: inset 0 0 0 1.5px #ffffff;
+}
+
+.stacked-bar-empty {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: 13px;
+}
+
+/* 2-Column Categories Grid */
+.expense-categories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 12px;
+}
+
+.expense-cat-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: opacity 0.2s ease, background-color 0.15s ease, transform 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.expense-cat-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.expense-cat-item:active {
+  transform: scale(0.98);
+}
+
+.expense-cat-item.is-dimmed {
+  opacity: 0.35;
+}
+
+.expense-cat-item.is-selected {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.expense-cat-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.expense-cat-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.expense-cat-dot {
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background-color: var(--cat-color, #bf5af2);
+  flex-shrink: 0;
+}
+
+.expense-cat-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ios-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expense-cat-percent {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-label);
+  flex-shrink: 0;
+}
+
+.expense-cat-amount {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ios-label-secondary);
+  padding-left: 13.5px;
+  margin-top: 1px;
 }
 
 /* Compact frosted analytics button in the header */
@@ -502,21 +684,10 @@ body {
 }
 
 .transactions-list {
-  flex: 1 1 0%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 94px);
-}
-
-.transactions-list::-webkit-scrollbar {
-  display: none;
+  overflow: visible;
 }
 
 .date-group-section {

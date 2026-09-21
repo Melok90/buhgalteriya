@@ -4,7 +4,7 @@
  */
 
 // --- 1. Конфигурация и начальные данные со скриншота ---
-const STORAGE_KEY = 'accounting_app_data_v1';
+const STORAGE_KEY = 'accounting_app_data_v2';
 
 const CATEGORIES = [
   { 
@@ -22,31 +22,31 @@ const CATEGORIES = [
   { 
     id: 'transport', 
     name: 'Транспорт', 
-    hex: '#0a84ff', 
+    hex: '#ffd60a', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>`
   }, 
   { 
     id: 'shopping', 
     name: 'Покупки', 
-    hex: '#ff375f', 
+    hex: '#ff453a', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`
   }, 
   { 
     id: 'home', 
     name: 'Дом', 
-    hex: '#ffd60a', 
+    hex: '#64d2ff', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
   }, 
   { 
     id: 'health', 
     name: 'Здоровье', 
-    hex: '#ff453a', 
+    hex: '#30d158', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
   }, 
   { 
     id: 'sport', 
     name: 'Спорт', 
-    hex: '#30d158', 
+    hex: '#32ade6', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1Z"/><path d="M22 4v16a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1Z"/><path d="M6 12h12"/><path d="M6 8h2v8H6z"/><path d="M16 8h2v8h-2z"/></svg>`
   }, 
   { 
@@ -54,6 +54,12 @@ const CATEGORIES = [
     name: 'Кафе', 
     hex: '#ff9f0a', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`
+  },
+  { 
+    id: 'entertainment', 
+    name: 'Развлечения', 
+    hex: '#ff375f', 
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`
   },
   {
     id: 'other',
@@ -114,16 +120,25 @@ const INCOME_CATEGORIES = [
   }
 ];
 
-const INITIAL_BALANCE = 19605;
+const INITIAL_BALANCE = -45716;
 
 const INITIAL_TRANSACTIONS = [
-  { id: 101, categoryId: 'shopping', amount: 4545, comment: 'Расход', place: 'Wildberries', date: new Date().toISOString() },
-  { id: 1, categoryId: 'food', amount: 6273, comment: 'Продукты', place: 'Ашан', date: new Date(Date.now() - 86400000).toISOString() },
-  { id: 2, categoryId: 'shopping', amount: 4571, comment: 'Маркетплейс', place: 'Wildberries', date: new Date(Date.now() - 172800000).toISOString() },
-  { id: 3, categoryId: 'health', amount: 4000, comment: 'Здоровье', place: 'Клиника', date: new Date(Date.now() - 250000000).toISOString() },
-  { id: 4, categoryId: 'home', amount: 2234, comment: 'ЖКХ', place: 'Мосэнерго', date: new Date(Date.now() - 300000000).toISOString() },
-  { id: 5, categoryId: 'health', amount: 597, comment: 'Аптека', place: 'Ригла', date: new Date(Date.now() - 400000000).toISOString() },
-  { id: 6, categoryId: 'sport', amount: 499, comment: 'Спорт', place: 'Велопрокат', date: new Date(Date.now() - 500000000).toISOString() },
+  // Вчера
+  { id: 1, categoryId: 'food', amount: 25555, comment: 'Еда', place: '', date: new Date(Date.now() - 86400000).toISOString() },
+  // 19 сентября
+  { id: 2, categoryId: 'transport', amount: 345, comment: 'Транспорт', place: '', date: new Date(Date.now() - 172800000).toISOString() },
+  { id: 3, categoryId: 'food', amount: 4334, comment: 'Еда', place: '', date: new Date(Date.now() - 172800000 - 3600000).toISOString() },
+  { id: 4, categoryId: 'food', amount: 53, comment: 'dyeryeryeeyeryer', place: '', date: new Date(Date.now() - 172800000 - 7200000).toISOString() },
+  { id: 5, categoryId: 'shopping', amount: 500, comment: 'Покупки', place: '', date: new Date(Date.now() - 172800000 - 10800000).toISOString() },
+  { id: 6, categoryId: 'food', amount: 34534, comment: 'Еда', place: '', date: new Date(Date.now() - 172800000 - 14400000).toISOString() },
+  { id: 7, categoryId: 'shopping', amount: 4545, comment: 'Расход', place: 'Wildberries', date: new Date(Date.now() - 172800000 - 18000000).toISOString() },
+  // Ранее в сентябре
+  { id: 8, categoryId: 'shopping', amount: 6998, comment: 'Маркетплейс', place: 'Ozon', date: new Date(Date.now() - 250000000).toISOString() },
+  { id: 9, categoryId: 'transport', amount: 5600, comment: 'Бензин', place: 'Лукойл', date: new Date(Date.now() - 320000000).toISOString() },
+  { id: 10, categoryId: 'coffee', amount: 1820, comment: 'Кафе', place: 'Surf Coffee', date: new Date(Date.now() - 400000000).toISOString() },
+  { id: 11, categoryId: 'entertainment', amount: 1534, comment: 'Развлечения', place: 'Кино', date: new Date(Date.now() - 480000000).toISOString() },
+  { id: 12, categoryId: 'home', amount: 2221, comment: 'ЖКХ', place: 'Мосэнерго', date: new Date(Date.now() - 550000000).toISOString() },
+  { id: 13, categoryId: 'health', amount: 500, comment: 'Аптека', place: 'Ригла', date: new Date(Date.now() - 620000000).toISOString() }
 ];
 
 const PRIVACY_KEY = 'accounting_privacy_mode';
@@ -200,6 +215,8 @@ function triggerHaptic(type = 'light') {
 }
 
 // --- 4. DOM элементы ---
+const searchWrapperEl = document.querySelector('.search-wrapper');
+const searchTagsContainerEl = document.getElementById('search-tags-container');
 const categoriesFilterEl = document.getElementById('categories-filter');
 const transactionsListEl = document.getElementById('transactions-list');
 const balanceCardEl = document.getElementById('balance-card');
@@ -210,6 +227,9 @@ const spendingPeriodLabelEl = document.getElementById('spending-period-label');
 const totalSpentBadgeEl = document.getElementById('total-spent-amount');
 const dailyAvgAmountEl = document.getElementById('daily-avg-amount');
 const quickAnalyticsBtnEl = document.getElementById('quick-analytics-btn');
+const expenseStructureCardEl = document.getElementById('expense-structure-card');
+const expenseStackedBarEl = document.getElementById('expense-stacked-bar');
+const expenseCategoriesGridEl = document.getElementById('expense-categories-grid');
 const txCountBadgeEl = document.getElementById('tx-count-badge');
 const searchInputEl = document.getElementById('search-input');
 const searchClearBtnEl = document.getElementById('search-clear-btn');
@@ -594,6 +614,127 @@ function groupTransactionsByDate(txList) {
   return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
 }
 
+// --- 5.2 Расчет и рендеринг блока «Структура расходов» ---
+function renderExpenseStructure() {
+  if (!expenseStackedBarEl || !expenseCategoriesGridEl) return;
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  // Все расходы (исключая доходы)
+  const allExpenseTxs = state.transactions.filter(tx => tx.type !== 'income');
+  // Расходы текущего месяца
+  const monthExpenseTxs = allExpenseTxs.filter(tx => {
+    if (!tx.date) return false;
+    const d = new Date(tx.date);
+    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+  });
+
+  const expenseTxs = monthExpenseTxs.length > 0 ? monthExpenseTxs : allExpenseTxs;
+  const totalExpense = expenseTxs.reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+
+  // Группировка расходов по категориям
+  const catSums = {};
+  expenseTxs.forEach(tx => {
+    const catId = tx.categoryId || 'other';
+    catSums[catId] = (catSums[catId] || 0) + (Number(tx.amount) || 0);
+  });
+
+  // Активные категории с расходами
+  const activeCats = Object.keys(catSums)
+    .map(catId => {
+      const catDef = CATEGORIES.find(c => c.id === catId) || {
+        id: catId,
+        name: catId === 'other' ? 'Другое' : catId,
+        hex: '#8e8e93'
+      };
+      const amount = catSums[catId];
+      const percent = totalExpense > 0 ? (amount / totalExpense) * 100 : 0;
+      return {
+        id: catId,
+        name: catDef.name,
+        hex: catDef.hex || '#8e8e93',
+        amount,
+        percent
+      };
+    })
+    .sort((a, b) => b.amount - a.amount);
+
+  if (activeCats.length === 0 || totalExpense === 0) {
+    expenseStackedBarEl.innerHTML = '<div class="stacked-bar-empty"></div>';
+    expenseCategoriesGridEl.innerHTML = '<div style="grid-column: 1 / -1; color: var(--ios-label-tertiary); font-size: 13px; text-align: center; padding: 12px 0;">Нет расходов за выбранный период</div>';
+    return;
+  }
+
+  const hasFilter = state.selectedFilter !== 'all';
+
+  // 1. Stacked Bar Сегменты
+  expenseStackedBarEl.innerHTML = activeCats.map(cat => {
+    const isSelected = state.selectedFilter === cat.id;
+    const isDimmed = hasFilter && !isSelected;
+    const widthPct = Math.max(cat.percent, 1.8);
+    const formattedPct = cat.percent < 1 ? '<1%' : `${cat.percent.toFixed(1)}%`;
+    return `
+      <div 
+        class="stacked-bar-segment ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+        data-cat-id="${cat.id}"
+        style="--cat-color: ${cat.hex}; width: ${widthPct}%;"
+        title="${escapeHtml(cat.name)}: ${formatRub(cat.amount)} (${formattedPct})"
+        role="button"
+        tabindex="0"
+        aria-label="${escapeHtml(cat.name)} ${formattedPct}"
+      ></div>
+    `;
+  }).join('');
+
+  // 2. 2-Колоночная Сетка Категорий
+  expenseCategoriesGridEl.innerHTML = activeCats.map(cat => {
+    const isSelected = state.selectedFilter === cat.id;
+    const isDimmed = hasFilter && !isSelected;
+    const formattedPct = cat.percent < 0.5 ? '<1%' : `${cat.percent.toFixed(1)}%`;
+    return `
+      <div 
+        class="expense-cat-item ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+        data-cat-id="${cat.id}"
+        role="button"
+        tabindex="0"
+        aria-pressed="${isSelected}"
+      >
+        <div class="expense-cat-row-top">
+          <div class="expense-cat-meta">
+            <span class="expense-cat-dot" style="--cat-color: ${cat.hex};"></span>
+            <span class="expense-cat-name">${escapeHtml(cat.name)}</span>
+          </div>
+          <span class="expense-cat-percent num-tabular">${formattedPct}</span>
+        </div>
+        <div class="expense-cat-amount num-tabular">${formatRub(cat.amount)}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Интерактивный клик по категориям для фильтрации
+  const catElements = [
+    ...expenseStackedBarEl.querySelectorAll('[data-cat-id]'),
+    ...expenseCategoriesGridEl.querySelectorAll('[data-cat-id]')
+  ];
+
+  catElements.forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetCatId = el.getAttribute('data-cat-id');
+      triggerHaptic('selection');
+      if (state.selectedFilter === targetCatId) {
+        state.selectedFilter = 'all';
+      } else {
+        state.selectedFilter = targetCatId;
+      }
+      renderCategoryChips();
+      renderApp();
+    });
+  });
+}
+
 function renderApp() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -637,14 +778,8 @@ function renderApp() {
   }
   renderPrivacyIcon();
 
-  // Скрытие плашки баланса при активном поиске/фильтре
-  const hasFilter = state.selectedFilter !== 'all';
-  const hasSearch = Boolean(state.searchQuery.trim());
-  if (hasFilter || hasSearch) {
-    balanceCardEl.classList.add('hidden');
-  } else {
-    balanceCardEl.classList.remove('hidden');
-  }
+  // Рендеринг аналитического блока «Структура расходов»
+  renderExpenseStructure();
 
   // Фильтрация
   const q = state.searchQuery.toLowerCase().trim();
@@ -1213,23 +1348,59 @@ function setupEventListeners() {
     });
   }
 
+  function openSearchMode() {
+    if (searchWrapperEl) searchWrapperEl.classList.add('is-active');
+    if (searchTagsContainerEl) {
+      searchTagsContainerEl.classList.add('is-open');
+      searchTagsContainerEl.setAttribute('aria-hidden', 'false');
+    }
+    if (searchClearBtnEl) {
+      searchClearBtnEl.classList.remove('hidden');
+    }
+  }
+
+  function closeSearchMode(force = false) {
+    if (!force && (state.searchQuery || state.selectedFilter !== 'all')) {
+      return;
+    }
+    if (searchWrapperEl) searchWrapperEl.classList.remove('is-active');
+    if (searchTagsContainerEl) {
+      searchTagsContainerEl.classList.remove('is-open');
+      searchTagsContainerEl.setAttribute('aria-hidden', 'true');
+    }
+    if (searchClearBtnEl && !state.searchQuery) {
+      searchClearBtnEl.classList.add('hidden');
+    }
+  }
+
   // Фильтры категорий
   categoriesFilterEl.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-cat]');
     if (!btn) return;
     triggerHaptic('selection');
-    state.selectedFilter = btn.dataset.cat;
+    const cat = btn.dataset.cat;
+    if (state.selectedFilter === cat && cat !== 'all') {
+      state.selectedFilter = 'all';
+    } else {
+      state.selectedFilter = cat;
+    }
     renderCategoryChips();
     renderApp();
   });
 
-  // Поиск
+  // Поиск — фокус и клик открывают теги
+  searchInputEl.addEventListener('focus', () => {
+    openSearchMode();
+  });
+  searchInputEl.addEventListener('click', () => {
+    openSearchMode();
+  });
+
   searchInputEl.addEventListener('input', (e) => {
     state.searchQuery = e.target.value;
+    openSearchMode();
     if (state.searchQuery) {
       searchClearBtnEl.classList.remove('hidden');
-    } else {
-      searchClearBtnEl.classList.add('hidden');
     }
     renderApp();
   });
@@ -1237,10 +1408,29 @@ function setupEventListeners() {
   // Очистка поиска
   searchClearBtnEl.addEventListener('click', () => {
     triggerHaptic('light');
+    const wasEmpty = !state.searchQuery;
     state.searchQuery = '';
     searchInputEl.value = '';
-    searchClearBtnEl.classList.add('hidden');
+    state.selectedFilter = 'all';
+    renderCategoryChips();
     renderApp();
+    if (wasEmpty) {
+      closeSearchMode(true);
+      searchInputEl.blur();
+    } else {
+      searchInputEl.focus();
+    }
+  });
+
+  // Закрытие режима поиска при тапе вне шапки
+  document.addEventListener('click', (e) => {
+    if (!searchWrapperEl || !searchTagsContainerEl) return;
+    const clickedInside = searchWrapperEl.contains(e.target) || searchTagsContainerEl.contains(e.target);
+    if (!clickedInside) {
+      if (!state.searchQuery && state.selectedFilter === 'all') {
+        closeSearchMode(true);
+      }
+    }
   });
 
   // Модалка добавления
