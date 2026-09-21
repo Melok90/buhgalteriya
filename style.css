@@ -149,32 +149,123 @@ body {
   line-height: 1.15;
 }
 
-/* Touch-optimized Reset Button (min touch target: 44x44px) */
-.btn-reset {
+/* ==========================================================================
+   Top Header 3-Dots Menu & Popover (Local Progress & Backup)
+   ========================================================================== */
+.menu-container {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background-color: var(--ios-fill);
-  color: var(--ios-label-secondary);
+}
+
+.btn-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--ios-fill-tertiary);
   border: 0.5px solid rgba(255, 255, 255, 0.12);
-  padding: 0 14px;
-  min-height: 44px;
-  border-radius: var(--ios-radius-btn);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
+  color: var(--ios-label);
   cursor: pointer;
   transition: all 0.2s var(--ios-ease);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn-reset:hover {
-  background-color: var(--ios-bg-tertiary);
-  color: var(--ios-label);
+.btn-menu:hover {
+  background-color: var(--ios-fill);
+  color: #ffffff;
 }
 
-.btn-reset:active {
-  transform: scale(0.96);
+.btn-menu:active {
+  transform: scale(0.92);
   opacity: 0.8;
+}
+
+.header-menu-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 224px;
+  background: rgba(32, 32, 36, 0.94);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75);
+  padding: 6px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transform-origin: top right;
+  transition: opacity 0.18s ease, transform 0.18s var(--ios-spring);
+}
+
+.header-menu-popover.hidden {
+  display: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu-item svg {
+  flex-shrink: 0;
+  color: var(--ios-label-secondary);
+  transition: color 0.15s ease;
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.menu-item:hover svg {
+  color: #ffffff;
+}
+
+.menu-item:active {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.menu-item-destructive {
+  color: var(--ios-red);
+}
+
+.menu-item-destructive svg {
+  color: var(--ios-red);
+}
+
+.menu-item-destructive:hover {
+  background-color: rgba(255, 69, 58, 0.12);
+  color: #ff6961;
+}
+
+.menu-item-destructive:hover svg {
+  color: #ff6961;
+}
+
+.menu-divider {
+  height: 0.5px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 4px 6px;
 }
 
 /* ==========================================================================

@@ -255,7 +255,14 @@ const sheetCommentClearBtnEl = document.getElementById('sheet-comment-clear-btn'
 const calculatorKeypadEl = document.querySelector('.calculator-keypad');
 const submitBtnEl = document.getElementById('submit-btn');
 const sheetDeleteTxBtnEl = document.getElementById('sheet-delete-tx-btn');
-const resetBtnEl = document.getElementById('reset-btn');
+
+// Top Header 3-Dots Menu
+const menuBtnEl = document.getElementById('menu-btn');
+const headerMenuPopoverEl = document.getElementById('header-menu-popover');
+const menuSaveBtnEl = document.getElementById('menu-save-btn');
+const menuRestoreBtnEl = document.getElementById('menu-restore-btn');
+const menuResetBtnEl = document.getElementById('menu-reset-btn');
+const backupFileInputEl = document.getElementById('backup-file-input');
 
 // Action Toast (Отмена / Редактирование последней операции)
 const actionToastEl = document.getElementById('action-toast');
@@ -1127,19 +1134,29 @@ function closeBottomSheet() {
 // --- Уведомление о действии (Action Toast: Отменить / Изменить) ---
 let toastTimeout = null;
 
-function showActionToast(tx, mode = 'created') {
+function showActionToast(txOrMessage, mode = 'created') {
   if (!actionToastEl) return;
   clearTimeout(toastTimeout);
 
-  state.recentTxId = tx.id;
-  const isIncome = tx.type === 'income';
-  const typeText = isIncome ? 'Пополнение' : 'Расход';
-  const amountFormatted = formatRub(tx.amount);
+  if (typeof txOrMessage === 'string') {
+    state.recentTxId = null;
+    if (toastTextEl) toastTextEl.textContent = txOrMessage;
+    if (toastEditBtnEl) toastEditBtnEl.classList.add('hidden');
+    if (toastUndoBtnEl) toastUndoBtnEl.classList.add('hidden');
+  } else {
+    const tx = txOrMessage;
+    state.recentTxId = tx.id;
+    const isIncome = tx.type === 'income';
+    const typeText = isIncome ? 'Пополнение' : 'Расход';
+    const amountFormatted = formatRub(tx.amount);
 
-  if (toastTextEl) {
-    toastTextEl.textContent = mode === 'edited'
-      ? `Изменения сохранены · ${amountFormatted}`
-      : `${typeText} ${amountFormatted} добавлен`;
+    if (toastTextEl) {
+      toastTextEl.textContent = mode === 'edited'
+        ? `Изменения сохранены · ${amountFormatted}`
+        : `${typeText} ${amountFormatted} добавлен`;
+    }
+    if (toastEditBtnEl) toastEditBtnEl.classList.remove('hidden');
+    if (toastUndoBtnEl) toastUndoBtnEl.classList.remove('hidden');
   }
 
   actionToastEl.classList.remove('hiding');
@@ -1147,7 +1164,7 @@ function showActionToast(tx, mode = 'created') {
 
   toastTimeout = setTimeout(() => {
     hideActionToast();
-  }, 5500);
+  }, 4500);
 }
 
 function hideActionToast() {
@@ -1727,24 +1744,148 @@ function setupEventListeners() {
     }
   });
 
-  // Сброс к исходным данным со скриншота
-  resetBtnEl.addEventListener('click', () => {
-    if (confirm('Сбросить данные к начальным значениям со скриншота (19 605 ₽)?')) {
-      triggerHaptic('heavy');
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(PRIVACY_KEY);
-      state.balance = INITIAL_BALANCE;
-      state.transactions = [...INITIAL_TRANSACTIONS];
-      state.selectedFilter = 'all';
-      state.searchQuery = '';
-      state.isPrivate = false;
-      searchInputEl.value = '';
-      searchClearBtnEl.classList.add('hidden');
-      saveState();
-      renderCategoryChips();
-      renderApp();
+  // Меню в шапке (3 точки) — локальное сохранение и резервное копирование
+  function openHeaderMenu() {
+    triggerHaptic('light');
+    if (headerMenuPopoverEl) {
+      headerMenuPopoverEl.classList.remove('hidden');
+    }
+    if (menuBtnEl) {
+      menuBtnEl.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function closeHeaderMenu() {
+    if (headerMenuPopoverEl) {
+      headerMenuPopoverEl.classList.add('hidden');
+    }
+    if (menuBtnEl) {
+      menuBtnEl.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (menuBtnEl) {
+    menuBtnEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (headerMenuPopoverEl && headerMenuPopoverEl.classList.contains('hidden')) {
+        openHeaderMenu();
+      } else {
+        closeHeaderMenu();
+      }
+    });
+  }
+
+  // Клик вне меню закрывает его
+  document.addEventListener('click', (e) => {
+    if (headerMenuPopoverEl && !headerMenuPopoverEl.classList.contains('hidden')) {
+      if (!headerMenuPopoverEl.contains(e.target) && e.target !== menuBtnEl) {
+        closeHeaderMenu();
+      }
     }
   });
+
+  // 1. Сохранить прогресс локально / Экспорт в JSON файл
+  if (menuSaveBtnEl) {
+    menuSaveBtnEl.addEventListener('click', () => {
+      triggerHaptic('success');
+      closeHeaderMenu();
+      saveState();
+
+      try {
+        const backupData = {
+          app: 'buhgalteriya',
+          version: '1.2.0',
+          exportedAt: new Date().toISOString(),
+          balance: state.balance,
+          transactions: state.transactions,
+          isPrivate: state.isPrivate
+        };
+        const jsonStr = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        link.href = url;
+        link.download = `buhgalteriya_backup_${dateStr}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showActionToast('Прогресс сохранен в файл');
+      } catch (err) {
+        console.error('Ошибка создания файла бэкапа', err);
+        showActionToast('Прогресс сохранен локально');
+      }
+    });
+  }
+
+  // 2. Восстановить из файла
+  if (menuRestoreBtnEl) {
+    menuRestoreBtnEl.addEventListener('click', () => {
+      triggerHaptic('light');
+      closeHeaderMenu();
+      if (backupFileInputEl) {
+        backupFileInputEl.value = '';
+        backupFileInputEl.click();
+      }
+    });
+  }
+
+  if (backupFileInputEl) {
+    backupFileInputEl.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (typeof parsed.balance !== 'number' || !Array.isArray(parsed.transactions)) {
+            throw new Error('Некорректный формат файла');
+          }
+          triggerHaptic('success');
+          state.balance = parsed.balance;
+          state.transactions = parsed.transactions;
+          if (typeof parsed.isPrivate === 'boolean') {
+            state.isPrivate = parsed.isPrivate;
+          }
+          saveState();
+          renderCategoryChips();
+          renderApp();
+          showActionToast(`Восстановлено ${parsed.transactions.length} операций`);
+        } catch (err) {
+          triggerHaptic('error');
+          alert('Ошибка чтения файла: выберите корректный JSON-файл резервной копии.');
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  // 3. Сброс данных к начальным
+  if (menuResetBtnEl) {
+    menuResetBtnEl.addEventListener('click', () => {
+      closeHeaderMenu();
+      if (confirm('Сбросить все данные к исходным демо-данным?')) {
+        triggerHaptic('heavy');
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(PRIVACY_KEY);
+        state.balance = INITIAL_BALANCE;
+        state.transactions = [...INITIAL_TRANSACTIONS];
+        state.selectedFilter = 'all';
+        state.searchQuery = '';
+        state.isPrivate = false;
+        if (searchInputEl) searchInputEl.value = '';
+        if (searchClearBtnEl) searchClearBtnEl.classList.add('hidden');
+        saveState();
+        renderCategoryChips();
+        renderApp();
+        showActionToast('Данные сброшены к исходным');
+      }
+    });
+  }
 
   // Закрытие шторок по клавише Escape
   window.addEventListener('keydown', (e) => {
