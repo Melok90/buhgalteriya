@@ -512,20 +512,39 @@ body {
 .expense-stacked-bar {
   width: 100%;
   height: 26px;
-  border-radius: 13px;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: transparent;
   display: flex;
-  gap: 2px;
-  overflow: hidden;
-  margin-bottom: 15px;
+  gap: 3.5px;
+  overflow: visible;
+  margin-bottom: 16px;
 }
 
 .stacked-bar-segment {
   height: 100%;
   background-color: var(--cat-color, #bf5af2);
-  transition: width 0.35s var(--ios-spring), opacity 0.25s ease, filter 0.2s ease;
+  border-radius: 4px;
+  transition: opacity 0.25s ease, filter 0.2s ease, transform 0.18s ease;
   cursor: pointer;
   position: relative;
+  min-width: 8px;
+}
+
+.stacked-bar-segment:first-child {
+  border-top-left-radius: 13px;
+  border-bottom-left-radius: 13px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.stacked-bar-segment:last-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-top-right-radius: 13px;
+  border-bottom-right-radius: 13px;
+}
+
+.stacked-bar-segment:only-child {
+  border-radius: 13px;
 }
 
 .stacked-bar-segment:hover {
@@ -539,7 +558,7 @@ body {
 .stacked-bar-segment.is-selected {
   opacity: 1;
   filter: brightness(1.25);
-  box-shadow: inset 0 0 0 1.5px #ffffff;
+  box-shadow: 0 0 0 1.5px #ffffff, 0 0 12px rgba(255, 255, 255, 0.45);
 }
 
 .stacked-bar-empty {

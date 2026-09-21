@@ -709,13 +709,13 @@ function renderExpenseStructure() {
   expenseStackedBarEl.innerHTML = displayCats.map(cat => {
     const isSelected = state.selectedFilter === cat.id;
     const isDimmed = hasFilter && !isSelected;
-    const widthPct = Math.max(cat.percent, 1.8);
+    const flexWeight = Math.max(cat.percent, 2);
     const formattedPct = cat.percent < 1 ? '<1%' : `${cat.percent.toFixed(1)}%`;
     return `
       <div 
         class="stacked-bar-segment ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
         data-cat-id="${cat.id}"
-        style="--cat-color: ${cat.hex}; width: ${widthPct}%;"
+        style="--cat-color: ${cat.hex}; flex: ${flexWeight} 1 0%;"
         title="${escapeHtml(cat.name)}: ${formatRub(cat.amount)} (${formattedPct})"
         role="button"
         tabindex="0"
