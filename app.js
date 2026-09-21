@@ -667,10 +667,27 @@ function renderExpenseStructure() {
     return;
   }
 
+  // Ограничение: максимум 6 категорий в блоке структуры расходов
+  let displayCats = activeCats;
+  if (activeCats.length > 6) {
+    const top5 = activeCats.slice(0, 5);
+    const others = activeCats.slice(5);
+    const otherAmount = others.reduce((sum, c) => sum + c.amount, 0);
+    const otherPercent = totalExpense > 0 ? (otherAmount / totalExpense) * 100 : 0;
+    top5.push({
+      id: 'other',
+      name: 'Другое',
+      hex: '#8e8e93',
+      amount: otherAmount,
+      percent: otherPercent
+    });
+    displayCats = top5;
+  }
+
   const hasFilter = state.selectedFilter !== 'all';
 
   // 1. Stacked Bar Сегменты
-  expenseStackedBarEl.innerHTML = activeCats.map(cat => {
+  expenseStackedBarEl.innerHTML = displayCats.map(cat => {
     const isSelected = state.selectedFilter === cat.id;
     const isDimmed = hasFilter && !isSelected;
     const widthPct = Math.max(cat.percent, 1.8);
@@ -688,8 +705,8 @@ function renderExpenseStructure() {
     `;
   }).join('');
 
-  // 2. 2-Колоночная Сетка Категорий
-  expenseCategoriesGridEl.innerHTML = activeCats.map(cat => {
+  // 2. 2-Колоночная Сетка Категорий (максимум 6) с вертикальным pill-индикатором
+  expenseCategoriesGridEl.innerHTML = displayCats.map(cat => {
     const isSelected = state.selectedFilter === cat.id;
     const isDimmed = hasFilter && !isSelected;
     const formattedPct = cat.percent < 0.5 ? '<1%' : `${cat.percent.toFixed(1)}%`;
@@ -701,14 +718,12 @@ function renderExpenseStructure() {
         tabindex="0"
         aria-pressed="${isSelected}"
       >
-        <div class="expense-cat-row-top">
-          <div class="expense-cat-meta">
-            <span class="expense-cat-dot" style="--cat-color: ${cat.hex};"></span>
-            <span class="expense-cat-name">${escapeHtml(cat.name)}</span>
-          </div>
-          <span class="expense-cat-percent num-tabular">${formattedPct}</span>
+        <div class="expense-cat-indicator" style="--cat-color: ${cat.hex};"></div>
+        <div class="expense-cat-info">
+          <span class="expense-cat-name">${escapeHtml(cat.name)}</span>
+          <span class="expense-cat-amount num-tabular">${formatRub(cat.amount)}</span>
         </div>
-        <div class="expense-cat-amount num-tabular">${formatRub(cat.amount)}</div>
+        <span class="expense-cat-percent num-tabular">${formattedPct}</span>
       </div>
     `;
   }).join('');

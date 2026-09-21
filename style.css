@@ -458,23 +458,25 @@ body {
   border-radius: 13px;
 }
 
-/* 2-Column Categories Grid */
+/* 2-Column Categories Grid (Max 6 Categories) */
 .expense-categories-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 16px;
-  row-gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 18px;
+  row-gap: 14px;
 }
 
 .expense-cat-item {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
-  padding: 4px 6px;
+  padding: 3px 4px;
   border-radius: 8px;
   transition: opacity 0.2s ease, background-color 0.15s ease, transform 0.15s ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  min-width: 0;
 }
 
 .expense-cat-item:hover {
@@ -486,7 +488,7 @@ body {
 }
 
 .expense-cat-item.is-dimmed {
-  opacity: 0.35;
+  opacity: 0.32;
 }
 
 .expense-cat-item.is-selected {
@@ -494,50 +496,50 @@ body {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-.expense-cat-row-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 4px;
-}
-
-.expense-cat-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.expense-cat-dot {
-  width: 7.5px;
-  height: 7.5px;
-  border-radius: 50%;
+/* Vertical Pill Indicator (Exact HIG Design from Reference) */
+.expense-cat-indicator {
+  width: 3px;
+  height: 32px;
+  border-radius: 2px;
   background-color: var(--cat-color, #bf5af2);
   flex-shrink: 0;
 }
 
+.expense-cat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
 .expense-cat-name {
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 500;
   color: var(--ios-label);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.expense-cat-percent {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ios-label);
-  flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .expense-cat-amount {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 400;
   color: var(--ios-label-secondary);
-  padding-left: 13.5px;
-  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.expense-cat-percent {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ios-label);
+  flex-shrink: 0;
+  text-align: right;
+  letter-spacing: -0.01em;
 }
 
 /* Compact frosted analytics button in the header */
