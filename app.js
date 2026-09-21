@@ -259,10 +259,22 @@ const sheetDeleteTxBtnEl = document.getElementById('sheet-delete-tx-btn');
 // Top Header 3-Dots Menu
 const menuBtnEl = document.getElementById('menu-btn');
 const headerMenuPopoverEl = document.getElementById('header-menu-popover');
+const menuAccountBtnEl = document.getElementById('menu-account-btn');
 const menuSaveBtnEl = document.getElementById('menu-save-btn');
 const menuRestoreBtnEl = document.getElementById('menu-restore-btn');
 const menuResetBtnEl = document.getElementById('menu-reset-btn');
 const backupFileInputEl = document.getElementById('backup-file-input');
+
+// Account Settings & Reset Sheet
+const accountSettingsBtnEl = document.getElementById('account-settings-btn');
+const accountBackdropEl = document.getElementById('account-backdrop');
+const accountSheetEl = document.getElementById('account-sheet');
+const accountCloseBtnEl = document.getElementById('account-close-btn');
+const accountHandleWrapperEl = document.getElementById('account-handle-wrapper');
+const accountBalanceInputEl = document.getElementById('account-balance-input');
+const accountClearTxsToggleEl = document.getElementById('account-clear-txs-toggle');
+const accountSaveBtnEl = document.getElementById('account-save-btn');
+const accountRestoreDemoBtnEl = document.getElementById('account-restore-demo-btn');
 
 // Action Toast (Отмена / Редактирование последней операции)
 const actionToastEl = document.getElementById('action-toast');
@@ -846,42 +858,24 @@ function renderApp() {
         const amountClass = isIncome ? 'tx-amount num-tabular is-income' : 'tx-amount num-tabular';
 
         return `
-          <div class="tx-swipe-wrapper" data-tx-wrapper="${tx.id}">
-            <!-- Underlying Red Action Button for Swipe-to-Delete -->
-            <button 
-              type="button" 
-              data-action="delete" 
-              data-id="${tx.id}" 
-              class="tx-delete-action"
-              title="Удалить запись"
-              aria-label="Удалить операцию ${escapeHtml(tx.comment)}"
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          <div class="tx-item" data-tx-row="${tx.id}" role="button" tabindex="0" aria-label="${escapeHtml(tx.comment)}, ${amountDisplay}">
+            <div class="tx-icon-badge" style="--cat-color: ${catColor};">
+              ${iconSvg}
+            </div>
+            
+            <div class="tx-info">
+              <span class="tx-title">${escapeHtml(tx.comment)}</span>
+              ${subtitle ? `<span class="tx-subtitle">${subtitle}</span>` : ''}
+            </div>
+
+            <div class="tx-amount-col">
+              <span class="${amountClass}">${amountDisplay}</span>
+            </div>
+
+            <div class="tx-chevron-indicator" aria-hidden="true">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
               </svg>
-              <span>Удалить</span>
-            </button>
-
-            <!-- Front Swipe Row -->
-            <div class="tx-item" data-tx-row="${tx.id}">
-              <div class="tx-icon-badge" style="--cat-color: ${catColor};">
-                ${iconSvg}
-              </div>
-              
-              <div class="tx-info">
-                <span class="tx-title">${escapeHtml(tx.comment)}</span>
-                ${subtitle ? `<span class="tx-subtitle">${subtitle}</span>` : ''}
-              </div>
-
-              <div class="tx-amount-col">
-                <span class="${amountClass}">${amountDisplay}</span>
-              </div>
-
-              <div class="tx-chevron-indicator">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-              </div>
             </div>
           </div>
         `;
@@ -900,131 +894,102 @@ function renderApp() {
       `;
     }).join('');
 
-    attachSwipeListeners();
-  }
-}
-
-// --- 7. Нативный iOS жест Swipe-to-delete ---
-let activeSwipedRow = null;
-
-function attachSwipeListeners() {
-  const rows = transactionsListEl.querySelectorAll('[data-tx-row]');
-  rows.forEach(row => {
-    let startX = 0;
-    let startY = 0;
-    let currentX = 0;
-    let isSwiping = false;
-    let isHorizontalGesture = null;
-
-    let hasSwiped = false;
-
-    row.addEventListener('touchstart', (e) => {
-      // Закрываем любую другую открытую строку
-      if (activeSwipedRow && activeSwipedRow !== row) {
-        closeSwipedRow(activeSwipedRow);
-      }
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      currentX = startX;
-      isSwiping = true;
-      isHorizontalGesture = null;
-      hasSwiped = false;
-      row.style.transition = 'none';
-    }, { passive: true });
-
-    row.addEventListener('touchmove', (e) => {
-      if (!isSwiping) return;
-      currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      const diffX = currentX - startX;
-      const diffY = currentY - startY;
-
-      // Если жест вертикальный — отменяем свайп строки, чтобы нативный вертикальный скролл работал свободно
-      if (isHorizontalGesture === null) {
-        if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
-          if (Math.abs(diffY) >= Math.abs(diffX)) {
-            isHorizontalGesture = false;
-            isSwiping = false;
-            row.style.transform = '';
-            return;
-          } else {
-            isHorizontalGesture = true;
-          }
-        } else {
-          return;
-        }
-      }
-
-      if (!isHorizontalGesture) return;
-
-      // Свайп только влево (до 78px с легким сопротивлением)
-      if (diffX < 0) {
-        const translate = Math.max(diffX, -88);
-        row.style.transform = `translateX(${translate}px)`;
-      } else if (row.dataset.open === 'true') {
-        // Если была открыта, тянем вправо
-        const translate = Math.min(diffX - 78, 0);
-        row.style.transform = `translateX(${translate}px)`;
-      }
-    }, { passive: true });
-
-    row.addEventListener('touchend', () => {
-      if (!isSwiping) return;
-      isSwiping = false;
-      const diffX = currentX - startX;
-      if (Math.abs(diffX) > 10) {
-        hasSwiped = true;
-        setTimeout(() => { hasSwiped = false; }, 250);
-      }
-      row.style.transition = 'transform 0.25s var(--ios-spring)';
-
-      if (diffX < -32) {
-        // Раскрыть кнопку удаления
-        row.style.transform = 'translateX(-78px)';
-        row.dataset.open = 'true';
-        activeSwipedRow = row;
-        triggerHaptic('light');
-      } else {
-        // Закрыть
-        row.style.transform = 'translateX(0px)';
-        delete row.dataset.open;
-        if (activeSwipedRow === row) activeSwipedRow = null;
-      }
-    });
-
-    // Клик по строке: если открыта — закрываем, иначе открываем на редактирование!
-    row.addEventListener('click', (e) => {
-      if (hasSwiped) {
-        e.stopPropagation();
-        return;
-      }
-      if (row.dataset.open === 'true') {
-        e.stopPropagation();
-        closeSwipedRow(row);
-      } else {
+    // Клик по строке операции открывает модальное окно редактирования
+    const rows = transactionsListEl.querySelectorAll('[data-tx-row]');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
         const txId = row.dataset.txRow;
         if (txId) {
           openEditSheet(txId);
         }
-      }
+      });
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const txId = row.dataset.txRow;
+          if (txId) {
+            openEditSheet(txId);
+          }
+        }
+      });
     });
+  }
+}
+
+// --- 7. Настройка счёта и ввод своих данных (Account Sheet) ---
+let accountSheetStartY = 0;
+let isDraggingAccountSheet = false;
+
+function openAccountSheet() {
+  triggerHaptic('medium');
+  if (accountBalanceInputEl) {
+    accountBalanceInputEl.value = state.balance > 0 ? String(state.balance) : '0';
+  }
+  if (accountClearTxsToggleEl) {
+    // Предлагаем очистить операции, если есть что очищать
+    accountClearTxsToggleEl.checked = state.transactions.length > 0;
+  }
+  if (accountBackdropEl && accountSheetEl) {
+    accountBackdropEl.classList.remove('hidden');
+    accountSheetEl.classList.remove('hidden');
+    accountSheetEl.style.transform = '';
+  }
+  setTimeout(() => {
+    if (accountBalanceInputEl) {
+      accountBalanceInputEl.focus();
+      accountBalanceInputEl.select();
+    }
+  }, 120);
+}
+
+function closeAccountSheet() {
+  triggerHaptic('light');
+  if (!accountSheetEl || !accountBackdropEl) return;
+  accountSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+  accountSheetEl.style.transform = 'translateY(100%)';
+  accountBackdropEl.style.opacity = '0';
+
+  setTimeout(() => {
+    accountBackdropEl.classList.add('hidden');
+    accountSheetEl.classList.add('hidden');
+    accountSheetEl.style.transform = '';
+    accountBackdropEl.style.opacity = '';
+  }, 250);
+}
+
+function initAccountDrag() {
+  if (!accountHandleWrapperEl || !accountSheetEl) return;
+
+  accountHandleWrapperEl.addEventListener('touchstart', (e) => {
+    accountSheetStartY = e.touches[0].clientY;
+    isDraggingAccountSheet = true;
+    accountSheetEl.style.transition = 'none';
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!isDraggingAccountSheet) return;
+    const currentY = e.touches[0].clientY;
+    const diffY = currentY - accountSheetStartY;
+    if (diffY > 0) {
+      accountSheetEl.style.transform = `translateY(${diffY}px)`;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (!isDraggingAccountSheet) return;
+    isDraggingAccountSheet = false;
+    const currentY = e.changedTouches[0].clientY;
+    const diffY = currentY - accountSheetStartY;
+
+    if (diffY > 80) {
+      closeAccountSheet();
+    } else {
+      accountSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
+      accountSheetEl.style.transform = 'translateY(0)';
+    }
   });
 }
 
-function closeSwipedRow(row) {
-  if (!row) return;
-  row.style.transition = 'transform 0.25s var(--ios-spring)';
-  row.style.transform = 'translateX(0px)';
-  delete row.dataset.open;
-  if (activeSwipedRow === row) activeSwipedRow = null;
-}
-
-// Закрытие открытого свайпа при клике вне списка
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('[data-tx-wrapper]') && activeSwipedRow) {
-    closeSwipedRow(activeSwipedRow);
-  }
-});
 
 // --- 8. Нативная шторка (Modal Sheet) с Drag-to-dismiss ---
 let sheetStartY = 0;
@@ -1720,29 +1685,7 @@ function setupEventListeners() {
     });
   }
 
-  // Удаление операции
-  transactionsListEl.addEventListener('click', (e) => {
-    const delBtn = e.target.closest('button[data-action="delete"]');
-    if (!delBtn) return;
-    e.stopPropagation();
 
-    const id = Number(delBtn.dataset.id);
-    const tx = state.transactions.find(t => t.id === id);
-    if (!tx) return;
-
-    const opName = tx.type === 'income' ? 'пополнение' : 'расход';
-    if (confirm(`Удалить ${opName} "${tx.comment}" (${formatRub(tx.amount)})?`)) {
-      triggerHaptic('warning');
-      if (tx.type === 'income') {
-        state.balance -= tx.amount;
-      } else {
-        state.balance += tx.amount;
-      }
-      state.transactions = state.transactions.filter(t => t.id !== id);
-      saveState();
-      renderApp();
-    }
-  });
 
   // Меню в шапке (3 точки) — локальное сохранение и резервное копирование
   function openHeaderMenu() {
@@ -1887,10 +1830,98 @@ function setupEventListeners() {
     });
   }
 
+  // 4. Настройка счёта и баланса
+  if (accountSettingsBtnEl) {
+    accountSettingsBtnEl.addEventListener('click', openAccountSheet);
+  }
+
+  if (menuAccountBtnEl) {
+    menuAccountBtnEl.addEventListener('click', () => {
+      closeHeaderMenu();
+      openAccountSheet();
+    });
+  }
+
+  if (balanceAmountTriggerEl) {
+    balanceAmountTriggerEl.addEventListener('click', openAccountSheet);
+  }
+
+  if (accountCloseBtnEl) {
+    accountCloseBtnEl.addEventListener('click', closeAccountSheet);
+  }
+
+  if (accountBackdropEl) {
+    accountBackdropEl.addEventListener('click', closeAccountSheet);
+  }
+
+  // Быстрые пресеты баланса
+  const presetChips = document.querySelectorAll('.account-preset-chip');
+  presetChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      triggerHaptic('selection');
+      const val = chip.dataset.preset;
+      if (accountBalanceInputEl) {
+        accountBalanceInputEl.value = val;
+        accountBalanceInputEl.focus();
+        accountBalanceInputEl.select();
+      }
+    });
+  });
+
+  // Сохранить новый баланс и опционально очистить операции
+  if (accountSaveBtnEl) {
+    accountSaveBtnEl.addEventListener('click', () => {
+      triggerHaptic('success');
+      const rawVal = accountBalanceInputEl ? accountBalanceInputEl.value.replace(/\s+/g, '').replace(',', '.') : '0';
+      const num = parseFloat(rawVal) || 0;
+      const cleanNum = Math.max(0, Math.round(num));
+
+      const shouldClearTxs = accountClearTxsToggleEl && accountClearTxsToggleEl.checked;
+
+      state.balance = cleanNum;
+      if (shouldClearTxs) {
+        state.transactions = [];
+        state.selectedFilter = 'all';
+        state.searchQuery = '';
+      }
+      saveState();
+      renderCategoryChips();
+      renderApp();
+      closeAccountSheet();
+
+      if (shouldClearTxs) {
+        showActionToast(`Счёт настроен: ${formatRub(cleanNum)} (операции очищены)`);
+      } else {
+        showActionToast(`Баланс обновлен: ${formatRub(cleanNum)}`);
+      }
+    });
+  }
+
+  // Восстановить демо-данные из окна счёта
+  if (accountRestoreDemoBtnEl) {
+    accountRestoreDemoBtnEl.addEventListener('click', () => {
+      if (confirm('Восстановить демо-данные (баланс 19 605 ₽ и исходные операции)?')) {
+        triggerHaptic('heavy');
+        state.balance = INITIAL_BALANCE;
+        state.transactions = [...INITIAL_TRANSACTIONS];
+        state.selectedFilter = 'all';
+        state.searchQuery = '';
+        state.isPrivate = false;
+        saveState();
+        renderCategoryChips();
+        renderApp();
+        closeAccountSheet();
+        showActionToast('Демо-данные восстановлены');
+      }
+    });
+  }
+
   // Закрытие шторок по клавише Escape
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (categoryPickerSheetEl && !categoryPickerSheetEl.classList.contains('hidden')) {
+      if (accountSheetEl && !accountSheetEl.classList.contains('hidden')) {
+        closeAccountSheet();
+      } else if (categoryPickerSheetEl && !categoryPickerSheetEl.classList.contains('hidden')) {
         closeCategoryPicker();
       } else if (!bottomSheetEl.classList.contains('hidden')) {
         closeBottomSheet();
@@ -1903,6 +1934,7 @@ function setupEventListeners() {
   initSheetDrag();
   initAnalyticsDrag();
   initCategoryPickerDrag();
+  initAccountDrag();
 }
 
 // --- 10. Инициализация ---
@@ -1921,6 +1953,10 @@ function init() {
       openBottomSheet('income');
     } else if (window.location.hash === '#analytics') {
       openAnalyticsSheet();
+    } else if (window.location.hash === '#account') {
+      openAccountSheet();
+    } else if (window.location.hash === '#menu') {
+      openHeaderMenu();
     }
   }
 }

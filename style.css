@@ -819,72 +819,40 @@ body {
   box-shadow: none;
 }
 
-/* Container for each swipable row */
-.tx-swipe-wrapper {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--ios-red);
-  touch-action: pan-y;
-}
-
-/* Hairline separator between items */
-.tx-swipe-wrapper:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 40px;
-  right: 0;
-  height: 0.5px;
-  background-color: rgba(255, 255, 255, 0.05);
-  z-index: 3;
-  pointer-events: none;
-}
-
-/* Underlying Red Delete Action for Swipe */
-.tx-delete-action {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 78px;
-  background-color: var(--ios-red);
-  color: #ffffff;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  z-index: 1;
-  transition: opacity 0.2s ease;
-}
-
-.tx-delete-action:active {
-  background-color: #d70015;
-}
-
-/* Front Sliding Row (Compact 44px HIG target on pure background) */
+/* Transaction Row (Clean Apple HIG list item) */
 .tx-item {
   position: relative;
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 2px;
-  background-color: var(--ios-bg-primary);
+  padding: 8px 6px;
+  background-color: transparent;
   cursor: pointer;
-  transform: translateX(0px);
-  transition: transform 0.24s var(--ios-spring), background-color 0.15s ease;
+  border-radius: 10px;
+  transition: background-color 0.16s ease, transform 0.16s var(--ios-spring);
   min-height: 48px;
-  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tx-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .tx-item:active {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(0.99);
+}
+
+/* Hairline separator between items */
+.tx-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 48px;
+  right: 6px;
+  height: 0.5px;
+  background-color: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
 }
 
 .tx-icon-badge {
@@ -1961,3 +1929,213 @@ body {
   background-color: #ffffff;
   transition: width 0.35s var(--ios-ease);
 }
+
+/* ==========================================================================
+   Account Settings & Reset Bottom Sheet
+   ========================================================================== */
+.sheet-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sheet-subtitle-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ios-accent);
+}
+
+.account-sheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0 16px 0;
+}
+
+.account-card-section {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.account-section-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ios-label-secondary);
+  margin-bottom: 8px;
+}
+
+.account-balance-input-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 0 12px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.account-balance-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--ios-label);
+  text-align: center;
+  width: 220px;
+  caret-color: var(--ios-accent);
+}
+
+.account-balance-input::placeholder {
+  color: var(--ios-label-tertiary);
+}
+
+.account-currency-symbol {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ios-label-tertiary);
+}
+
+.account-preset-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.account-preset-chip {
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--ios-label-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 4px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.account-preset-chip:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.account-preset-chip:active {
+  transform: scale(0.96);
+  background-color: var(--ios-accent);
+  color: #ffffff;
+}
+
+.account-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.account-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.account-option-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-label);
+}
+
+.account-option-desc {
+  font-size: 12px;
+  color: var(--ios-label-tertiary);
+  line-height: 1.3;
+}
+
+/* iOS Native Switch Toggle */
+.ios-switch-container {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.ios-switch-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ios-switch-track {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 31px;
+  transition: background-color 0.25s var(--ios-spring);
+}
+
+.ios-switch-track::before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s var(--ios-spring);
+}
+
+.ios-switch-checkbox:checked + .ios-switch-track {
+  background-color: var(--ios-green);
+}
+
+.ios-switch-checkbox:checked + .ios-switch-track::before {
+  transform: translateX(20px);
+}
+
+.account-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.account-demo-btn {
+  background: transparent;
+  border: none;
+  color: var(--ios-label-tertiary);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 0.16s ease, background-color 0.16s ease;
+  text-align: center;
+}
+
+.account-demo-btn:hover {
+  color: var(--ios-label);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.account-demo-btn:active {
+  transform: scale(0.98);
+}
+
