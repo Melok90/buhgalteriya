@@ -120,7 +120,7 @@ const INCOME_CATEGORIES = [
   }
 ];
 
-const INITIAL_BALANCE = -45716;
+const INITIAL_BALANCE = 45716;
 
 const INITIAL_TRANSACTIONS = [
   // Вчера
@@ -163,7 +163,13 @@ function loadState() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (typeof parsed.balance === 'number') state.balance = parsed.balance;
+      if (typeof parsed.balance === 'number') {
+        state.balance = parsed.balance;
+        // Если был сохранен старый отрицательный демо-баланс (-45716), делаем его положительным
+        if (state.balance === -45716) {
+          state.balance = INITIAL_BALANCE;
+        }
+      }
       if (Array.isArray(parsed.transactions)) state.transactions = parsed.transactions;
     }
     const priv = localStorage.getItem(PRIVACY_KEY);
@@ -1896,7 +1902,7 @@ function setupEventListeners() {
   // Восстановить демо-данные из окна счёта
   if (accountRestoreDemoBtnEl) {
     accountRestoreDemoBtnEl.addEventListener('click', () => {
-      if (confirm('Восстановить демо-данные (баланс 19 605 ₽ и исходные операции)?')) {
+      if (confirm('Восстановить демо-данные (баланс 45 716 ₽ и исходные операции)?')) {
         triggerHaptic('heavy');
         state.balance = INITIAL_BALANCE;
         state.transactions = [...INITIAL_TRANSACTIONS];
