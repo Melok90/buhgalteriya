@@ -804,11 +804,11 @@ function renderApp() {
   if (state.isPrivate) {
     balanceValueEl.textContent = '•••••• ₽';
     totalSpentBadgeEl.textContent = '•••••• ₽';
-    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = '~••• ₽';
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = '~ ••• ₽';
   } else {
     balanceValueEl.textContent = formatRub(state.balance);
     totalSpentBadgeEl.textContent = formatRub(displaySpent);
-    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = `~${formatRub(dailyAvg)}`;
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = `~ ${formatRub(dailyAvg)}`;
   }
   renderPrivacyIcon();
 
@@ -1840,10 +1840,6 @@ function setupEventListeners() {
       closeHeaderMenu();
       openAccountSheet();
     });
-  }
-
-  if (balanceAmountTriggerEl) {
-    balanceAmountTriggerEl.addEventListener('click', openAccountSheet);
   }
 
   if (accountCloseBtnEl) {
