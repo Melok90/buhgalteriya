@@ -927,21 +927,11 @@ body {
   transform: scale(0.99);
 }
 
-/* Hairline separator between items */
-.tx-item:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 48px;
-  right: 6px;
-  height: 0.5px;
-  background-color: rgba(255, 255, 255, 0.06);
-  pointer-events: none;
-}
+/* Hairline separator removed per user request */
 
 .tx-icon-badge {
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background-color: var(--cat-color, #ffffff);
   color: #000000;
@@ -954,8 +944,8 @@ body {
 }
 
 .tx-icon-badge svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   stroke: #000000;
 }
 
