@@ -2,24 +2,28 @@
    Apple Human Interface Guidelines (iOS 17/18) Design Tokens & Variables
    ========================================================================== */
 :root {
-  /* System Backgrounds (OLED Black Dark Palette) */
+  /* System Backgrounds (Apple Dark Mode Semantic Hierarchy) */
+  --ios-bg-base: #000000;
   --ios-bg-primary: #000000;
   --ios-bg-secondary: #1c1c1e;
   --ios-bg-tertiary: #2c2c2e;
   --ios-bg-grouped: #1c1c1e;
+  --ios-surface-grouped: #1c1c1e;
+  --ios-surface-elevated: #2c2c2e;
   --ios-fill: rgba(120, 120, 128, 0.24);
+  --ios-fill-search: rgba(120, 120, 128, 0.16);
   --ios-fill-tertiary: rgba(118, 118, 128, 0.14);
   --ios-fill-quaternary: rgba(116, 116, 128, 0.08);
 
-  /* Separators */
-  --ios-separator: rgba(84, 84, 88, 0.6);
-  --ios-separator-hairline: 0.5px solid rgba(84, 84, 88, 0.45);
+  /* Separators (Subtle Apple Hairlines) */
+  --ios-separator: rgba(255, 255, 255, 0.08);
+  --ios-separator-hairline: 0.5px solid rgba(255, 255, 255, 0.08);
 
-  /* Labels & Text */
+  /* Labels & Text (Apple 4-Level Semantic Palette) */
   --ios-label: #ffffff;
-  --ios-label-secondary: rgba(235, 235, 245, 0.65);
-  --ios-label-tertiary: rgba(235, 235, 245, 0.35);
-  --ios-label-quaternary: rgba(235, 235, 245, 0.18);
+  --ios-label-secondary: rgba(235, 235, 245, 0.60);
+  --ios-label-tertiary: rgba(235, 235, 245, 0.30);
+  --ios-label-quaternary: rgba(235, 235, 245, 0.16);
 
   /* Semantic Accents */
   --ios-accent: #5e5ce6;
@@ -34,9 +38,10 @@
 
   /* Corner Radii (Restrained Apple Squircle System) */
   --ios-radius-card: 20px;
+  --ios-radius-grouped: 18px;
   --ios-radius-sheet: 24px;
   --ios-radius-chip: 12px;
-  --ios-radius-input: 13px;
+  --ios-radius-input: 10px;
   --ios-radius-btn: 14px;
   --ios-radius-fab: 9999px;
 
@@ -159,6 +164,7 @@ body {
 }
 
 .btn-menu {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -171,6 +177,17 @@ body {
   cursor: pointer;
   transition: all 0.2s var(--ios-ease);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 44x44pt Apple HIG minimum touch target area */
+.btn-menu::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .btn-menu:hover {
@@ -280,9 +297,9 @@ body {
 
 .search-icon {
   position: absolute;
-  left: 14px;
-  width: 18px;
-  height: 18px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
   color: var(--ios-label-tertiary);
   pointer-events: none;
   transition: color 0.2s ease;
@@ -290,17 +307,18 @@ body {
 
 .search-input {
   width: 100%;
-  background-color: var(--ios-fill-tertiary);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--ios-fill-search);
+  border: none;
   color: var(--ios-label);
   font-family: inherit;
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 400;
-  padding: 11px 44px 11px 40px;
-  min-height: 42px;
+  padding: 8px 36px 8px 36px;
+  height: 36px;
+  min-height: 36px;
   border-radius: var(--ios-radius-input);
   outline: none;
-  transition: border-color 0.2s var(--ios-ease), box-shadow 0.2s var(--ios-ease), background-color 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s var(--ios-ease);
 }
 
 .search-input::placeholder {
@@ -309,9 +327,8 @@ body {
 
 .search-input:focus,
 .search-wrapper.is-active .search-input {
-  background-color: rgba(255, 255, 255, 0.09);
-  border-color: #5e5ce6;
-  box-shadow: 0 0 0 1px #5e5ce6, 0 0 14px rgba(94, 92, 230, 0.35);
+  background-color: rgba(120, 120, 128, 0.24);
+  box-shadow: 0 0 0 1.5px var(--ios-accent);
 }
 
 .search-wrapper:focus-within .search-icon,
@@ -319,21 +336,31 @@ body {
   color: #a5a3ff;
 }
 
-/* Search Clear Button with 44px hit target */
+/* Search Clear Button with 44px Apple HIG hit target */
 .search-clear-btn {
   position: absolute;
-  right: 2px;
+  right: 6px;
   background: none;
   border: none;
   color: var(--ios-label-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
   border-radius: 50%;
   transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.search-clear-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .search-clear-btn:hover {
@@ -1032,15 +1059,15 @@ body {
 }
 
 .section-title {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ios-label-tertiary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ios-label-secondary);
+  text-transform: none;
 }
 
 .tx-count-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--ios-label-tertiary);
 }
@@ -1048,44 +1075,45 @@ body {
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   overflow: visible;
 }
 
 .date-group-section {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 6px;
 }
 
 .date-group-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 6px 2px 3px 2px;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 6px 2px 6px;
 }
 
 .date-group-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ios-label-tertiary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ios-label-secondary);
+  text-transform: none;
 }
 
 .date-group-total {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   color: var(--ios-label-tertiary);
 }
 
 .date-group-card {
-  background-color: transparent;
-  border-radius: 0;
-  border: none;
+  background-color: var(--ios-surface-grouped);
+  border-radius: var(--ios-radius-grouped, 18px);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
   overflow: hidden;
-  box-shadow: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
 /* Transaction Row (Clean Apple HIG list item) */
@@ -1094,33 +1122,33 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 6px;
+  padding: 10px 14px;
   background-color: transparent;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: 0;
   transition: background-color 0.16s ease, transform 0.16s var(--ios-spring);
-  min-height: 48px;
+  min-height: 52px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .tx-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .tx-item:active {
   background-color: rgba(255, 255, 255, 0.08);
-  transform: scale(0.99);
+  transform: scale(0.995);
 }
 
-/* Hairline separator between items */
+/* Hairline separator between items inset to text start (62px) */
 .tx-item:not(:last-child)::after {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 48px;
-  right: 6px;
+  left: 62px;
+  right: 14px;
   height: 0.5px;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(255, 255, 255, 0.07);
   pointer-events: none;
 }
 
@@ -1250,26 +1278,29 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background-color: var(--ios-bg-tertiary);
+  background-color: rgba(34, 34, 40, 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  backdrop-filter: blur(24px) saturate(190%);
   color: #ffffff;
   padding: 0 24px 0 16px;
   min-height: 52px;
   border-radius: var(--ios-radius-fab);
-  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
   font-size: 16px;
   font-weight: 700;
   font-family: inherit;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 8px 24px rgba(0, 0, 0, 0.55);
   cursor: pointer;
-  transition: transform 0.2s var(--ios-spring), background-color 0.2s ease;
+  transition: transform 0.2s var(--ios-spring), background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .fab-btn:hover {
-  background-color: #38383a;
+  background-color: rgba(46, 46, 54, 0.85);
 }
 
 .fab-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
+  background-color: rgba(54, 54, 64, 0.9);
 }
 
 .fab-icon-circle {
@@ -2407,4 +2438,19 @@ body {
 .account-demo-btn:active {
   transform: scale(0.98);
 }
+
+/* ==========================================================================
+   Accessibility: Reduced Motion Preference (Apple HIG)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 
