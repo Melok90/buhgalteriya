@@ -836,7 +836,7 @@ body {
 }
 
 /* ==========================================================================
-   Section Header (iOS Inset Grouped Section Title)
+   Section Header (Clean Minimal Operations Header)
    ========================================================================== */
 .section-header {
   display: flex;
@@ -847,15 +847,15 @@ body {
 }
 
 .section-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ios-label-secondary);
-  text-transform: none;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ios-label-tertiary);
 }
 
 .tx-count-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--ios-label-tertiary);
 }
@@ -863,80 +863,79 @@ body {
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   overflow: visible;
 }
 
 .date-group-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 1px;
 }
 
 .date-group-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 4px 6px 2px 6px;
+  padding: 6px 2px 3px 2px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
 .date-group-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ios-label-secondary);
-  text-transform: none;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ios-label-tertiary);
 }
 
 .date-group-total {
-  font-size: 13px;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--ios-label-tertiary);
 }
 
 .date-group-card {
-  background-color: var(--ios-surface-grouped);
-  border-radius: var(--ios-radius-grouped, 18px);
-  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: none;
 }
 
-/* Transaction Row (Clean Apple HIG list item) */
+/* Transaction Row (Clean Apple list item matching reference) */
 .tx-item {
   position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 8px 6px;
   background-color: transparent;
   cursor: pointer;
-  border-radius: 0;
+  border-radius: 10px;
   transition: background-color 0.16s ease, transform 0.16s var(--ios-spring);
-  min-height: 52px;
+  min-height: 48px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .tx-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .tx-item:active {
   background-color: rgba(255, 255, 255, 0.08);
-  transform: scale(0.995);
+  transform: scale(0.99);
 }
 
-/* Hairline separator between items inset to text start (62px) */
+/* Hairline separator between items */
 .tx-item:not(:last-child)::after {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 62px;
-  right: 14px;
+  left: 48px;
+  right: 6px;
   height: 0.5px;
-  background-color: rgba(255, 255, 255, 0.07);
+  background-color: rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
 
