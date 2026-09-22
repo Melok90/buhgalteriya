@@ -730,28 +730,76 @@ function renderExpenseStructure() {
     `;
   }).join('');
 
-  // 2. 2-Колоночная Сетка Категорий (максимум 6) с вертикальным pill-индикатором
-  expenseCategoriesGridEl.innerHTML = displayCats.map(cat => {
+  // 2. Список категорий: Топ-4 полноразмерные строки + нижний 2-колоночный сплит для хвоста (5-6)
+  const topRows = displayCats.slice(0, 4);
+  const bottomSplit = displayCats.slice(4);
+
+  let breakdownHtml = topRows.map(cat => {
     const isSelected = state.selectedFilter === cat.id;
     const isDimmed = hasFilter && !isSelected;
     const formattedPct = cat.percent < 0.5 ? '<1%' : `${cat.percent.toFixed(1)}%`;
     return `
       <div 
-        class="expense-cat-item ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+        class="cat-breakdown-row ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
         data-cat-id="${cat.id}"
         role="button"
         tabindex="0"
         aria-pressed="${isSelected}"
       >
-        <div class="expense-cat-indicator" style="--cat-color: ${cat.hex};"></div>
-        <div class="expense-cat-info">
-          <span class="expense-cat-name">${escapeHtml(cat.name)}</span>
-          <span class="expense-cat-amount num-tabular">${formatRub(cat.amount)}</span>
+        <div class="cat-row-left">
+          <div class="cat-dot" style="--cat-color: ${cat.hex};"></div>
+          <span class="cat-row-name">${escapeHtml(cat.name)}</span>
         </div>
-        <span class="expense-cat-percent num-tabular">${formattedPct}</span>
+        <span class="cat-row-amount num-tabular">${formatRub(cat.amount)}</span>
+        <span class="cat-row-percent num-tabular">${formattedPct}</span>
+        <div class="cat-row-chevron" aria-hidden="true">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
       </div>
     `;
   }).join('');
+
+  if (bottomSplit.length > 0) {
+    const catLeft = bottomSplit[0];
+    const catRight = bottomSplit[1];
+
+    const formatSplitItem = (cat) => {
+      if (!cat) return '<div></div>';
+      const isSelected = state.selectedFilter === cat.id;
+      const isDimmed = hasFilter && !isSelected;
+      const formattedPct = cat.percent < 0.5 ? '<1%' : `${cat.percent.toFixed(1)}%`;
+      return `
+        <div 
+          class="cat-split-item ${isSelected ? 'is-selected' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+          data-cat-id="${cat.id}"
+          role="button"
+          tabindex="0"
+          aria-pressed="${isSelected}"
+        >
+          <div class="cat-split-header">
+            <div class="cat-dot" style="--cat-color: ${cat.hex};"></div>
+            <span class="cat-split-name">${escapeHtml(cat.name)}</span>
+          </div>
+          <div class="cat-split-subrow">
+            <span class="cat-split-amount num-tabular">${formatRub(cat.amount)}</span>
+            <span class="cat-split-percent num-tabular">${formattedPct}</span>
+          </div>
+        </div>
+      `;
+    };
+
+    breakdownHtml += `
+      <div class="cat-split-grid">
+        ${formatSplitItem(catLeft)}
+        ${catRight ? '<div class="cat-split-divider"></div>' : ''}
+        ${catRight ? formatSplitItem(catRight) : ''}
+      </div>
+    `;
+  }
+
+  expenseCategoriesGridEl.innerHTML = breakdownHtml;
 
   // Интерактивный клик по категориям для фильтрации
   const catElements = [
@@ -1713,8 +1761,21 @@ function setupEventListeners() {
     }
   }
 
+  const cardMenuBtnEl = document.getElementById('card-menu-btn');
+
   if (menuBtnEl) {
     menuBtnEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (headerMenuPopoverEl && headerMenuPopoverEl.classList.contains('hidden')) {
+        openHeaderMenu();
+      } else {
+        closeHeaderMenu();
+      }
+    });
+  }
+
+  if (cardMenuBtnEl) {
+    cardMenuBtnEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (headerMenuPopoverEl && headerMenuPopoverEl.classList.contains('hidden')) {
         openHeaderMenu();
@@ -1727,7 +1788,7 @@ function setupEventListeners() {
   // Клик вне меню закрывает его
   document.addEventListener('click', (e) => {
     if (headerMenuPopoverEl && !headerMenuPopoverEl.classList.contains('hidden')) {
-      if (!headerMenuPopoverEl.contains(e.target) && e.target !== menuBtnEl) {
+      if (!headerMenuPopoverEl.contains(e.target) && e.target !== menuBtnEl && (!cardMenuBtnEl || !cardMenuBtnEl.contains(e.target))) {
         closeHeaderMenu();
       }
     }
