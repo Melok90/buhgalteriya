@@ -214,9 +214,27 @@ function triggerHaptic(type = 'light') {
       } else {
         tg.HapticFeedback.impactOccurred(type);
       }
+      return;
     } catch (e) {
       // Игнорируем в обычном браузере
     }
+  }
+
+  // Fallback для нативных мобильных браузеров (Web Vibration API)
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try {
+      if (type === 'selection' || type === 'light') {
+        navigator.vibrate(8);
+      } else if (type === 'medium') {
+        navigator.vibrate(16);
+      } else if (type === 'heavy') {
+        navigator.vibrate(24);
+      } else if (type === 'success') {
+        navigator.vibrate([12, 30, 12]);
+      } else if (type === 'error') {
+        navigator.vibrate([24, 40, 24]);
+      }
+    } catch (e) {}
   }
 }
 
@@ -525,38 +543,181 @@ function closeCategoryPicker() {
   }, 250);
 }
 
-function initCategoryPickerDrag() {
-  if (!categoryPickerHandleWrapperEl || !categoryPickerSheetEl) return;
+/**
+ * Нативный контроллер жестов закрытия (Pull-to-Dismiss / Swipe down / Fling)
+ * Полная поддержка мобильных устройств (iOS Safari & Android Chrome):
+ * 1. Широкая зона захвата (полоска + шапка шторки, минимум 72px)
+ * 2. Двустороннее следование за пальцем (вниз со смещением, вверх с мягким резиновым сопротивлением Apple)
+ * 3. Распознавание быстрых свайпов/фликов (скорость velocity > 0.35 px/ms при сдвиге от 35px)
+ * 4. Динамическое затухание прозрачности затемнённого фона (backdrop)
+ * 5. Блокировка pull-to-refresh браузера при перетаскивании вниз
+ * 6. Корректная обработка touchcancel без залипания состояния
+ */
+function setupSheetGestures({ sheetEl, handleWrapperEl, headerEl, backdropEl, onClose }) {
+  if (!sheetEl || !handleWrapperEl) return;
+
   let startY = 0;
+  let startX = 0;
+  let startTime = 0;
+  let currentDiffY = 0;
   let isDragging = false;
+  let isLockedHorizontal = false;
 
-  categoryPickerHandleWrapperEl.addEventListener('touchstart', (e) => {
-    startY = e.touches[0].clientY;
-    isDragging = true;
-    categoryPickerSheetEl.style.transition = 'none';
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - startY;
-    if (diffY > 0) {
-      categoryPickerSheetEl.style.transform = `translateY(${diffY}px)`;
+  function canStartDrag(target) {
+    if (!target) return true;
+    // Не перехватываем жесты при нажатии на интерактивные элементы управления
+    if (target.closest('button, input, select, textarea, .ios-segment, .cat-picker-item, .calc-key, .tx-item')) {
+      return false;
     }
-  }, { passive: true });
+    return true;
+  }
 
-  window.addEventListener('touchend', (e) => {
+  function handleStart(clientX, clientY, target) {
+    if (!canStartDrag(target)) return;
+    startY = clientY;
+    startX = clientX;
+    startTime = performance.now();
+    currentDiffY = 0;
+    isDragging = true;
+    isLockedHorizontal = false;
+
+    sheetEl.style.transition = 'none';
+    if (backdropEl) backdropEl.style.transition = 'none';
+  }
+
+  function handleMove(clientX, clientY, e) {
+    if (!isDragging) return;
+
+    const diffY = clientY - startY;
+    const diffX = clientX - startX;
+
+    // Если жест явно горизонтальный в самом начале, не блокируем скролл и отменяем перетаскивание шторки
+    if (!isLockedHorizontal && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 12) {
+      isLockedHorizontal = true;
+      isDragging = false;
+      sheetEl.style.transition = 'transform 0.26s var(--ios-spring)';
+      sheetEl.style.transform = 'translateY(0)';
+      if (backdropEl) {
+        backdropEl.style.transition = 'opacity 0.24s var(--ios-ease)';
+        backdropEl.style.opacity = '1';
+      }
+      return;
+    }
+
+    currentDiffY = diffY;
+
+    if (diffY >= 0) {
+      // Предотвращаем дефолтный pull-to-refresh браузера
+      if (e && e.cancelable) e.preventDefault();
+      sheetEl.style.transform = `translateY(${diffY}px)`;
+      if (backdropEl) {
+        const opacity = Math.max(0, 1 - (diffY / 320));
+        backdropEl.style.opacity = opacity.toString();
+      }
+    } else {
+      // Движение выше нулевой точки — мягкое резиновое сопротивление (Apple rubber-band)
+      const rubberBand = Math.max(-20, diffY * 0.2);
+      sheetEl.style.transform = `translateY(${rubberBand}px)`;
+      if (backdropEl) backdropEl.style.opacity = '1';
+    }
+  }
+
+  function handleEnd(clientX, clientY) {
     if (!isDragging) return;
     isDragging = false;
-    const currentY = e.changedTouches[0].clientY;
-    const diffY = currentY - startY;
 
-    if (diffY > 80) {
-      closeCategoryPicker();
+    const diffY = clientY !== undefined ? (clientY - startY) : currentDiffY;
+    const elapsed = Math.max(1, performance.now() - startTime);
+    const velocity = diffY / elapsed; // px/ms
+
+    // Закрываем при сдвиге > 85px ИЛИ при быстром жесте (флике) вниз
+    const shouldClose = diffY > 85 || (diffY > 35 && velocity > 0.35);
+
+    if (shouldClose) {
+      onClose();
     } else {
-      categoryPickerSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
-      categoryPickerSheetEl.style.transform = 'translateY(0)';
+      sheetEl.style.transition = 'transform 0.26s var(--ios-spring)';
+      sheetEl.style.transform = 'translateY(0)';
+      if (backdropEl) {
+        backdropEl.style.transition = 'opacity 0.24s var(--ios-ease)';
+        backdropEl.style.opacity = '1';
+      }
     }
+  }
+
+  function handleCancel() {
+    if (!isDragging) return;
+    isDragging = false;
+    sheetEl.style.transition = 'transform 0.26s var(--ios-spring)';
+    sheetEl.style.transform = 'translateY(0)';
+    if (backdropEl) {
+      backdropEl.style.transition = 'opacity 0.24s var(--ios-ease)';
+      backdropEl.style.opacity = '1';
+    }
+  }
+
+  // Touch события
+  const onTouchStart = (e) => {
+    if (e.touches && e.touches.length === 1) {
+      handleStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }
+  };
+
+  const onTouchMove = (e) => {
+    if (!isDragging) return;
+    if (e.touches && e.touches.length === 1) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY, e);
+    }
+  };
+
+  const onTouchEnd = (e) => {
+    if (!isDragging) return;
+    const touch = e.changedTouches ? e.changedTouches[0] : null;
+    handleEnd(touch ? touch.clientX : undefined, touch ? touch.clientY : undefined);
+  };
+
+  // Mouse события (для тестирования и десктопа)
+  const onMouseDown = (e) => {
+    if (e.button !== 0) return;
+    handleStart(e.clientX, e.clientY, e.target);
+  };
+
+  const onMouseMove = (e) => {
+    if (!isDragging) return;
+    handleMove(e.clientX, e.clientY, e);
+  };
+
+  const onMouseUp = (e) => {
+    if (!isDragging) return;
+    handleEnd(e.clientX, e.clientY);
+  };
+
+  // Слушатели на полоске шторки
+  handleWrapperEl.addEventListener('touchstart', onTouchStart, { passive: true });
+  handleWrapperEl.addEventListener('mousedown', onMouseDown);
+
+  // Слушатели на шапке шторки (если передана)
+  if (headerEl) {
+    headerEl.addEventListener('touchstart', onTouchStart, { passive: true });
+    headerEl.addEventListener('mousedown', onMouseDown);
+  }
+
+  window.addEventListener('touchmove', onTouchMove, { passive: false });
+  window.addEventListener('touchend', onTouchEnd, { passive: true });
+  window.addEventListener('touchcancel', handleCancel, { passive: true });
+
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+}
+
+function initCategoryPickerDrag() {
+  if (!categoryPickerHandleWrapperEl || !categoryPickerSheetEl) return;
+  setupSheetGestures({
+    sheetEl: categoryPickerSheetEl,
+    handleWrapperEl: categoryPickerHandleWrapperEl,
+    headerEl: categoryPickerSheetEl.querySelector('.sheet-header'),
+    backdropEl: categoryPickerBackdropEl,
+    onClose: closeCategoryPicker
   });
 }
 
@@ -928,9 +1089,6 @@ function renderApp() {
 }
 
 // --- 7. Настройка счёта и ввод своих данных (Account Sheet) ---
-let accountSheetStartY = 0;
-let isDraggingAccountSheet = false;
-
 function openAccountSheet() {
   triggerHaptic('medium');
   if (accountBalanceInputEl) {
@@ -970,41 +1128,17 @@ function closeAccountSheet() {
 
 function initAccountDrag() {
   if (!accountHandleWrapperEl || !accountSheetEl) return;
-
-  accountHandleWrapperEl.addEventListener('touchstart', (e) => {
-    accountSheetStartY = e.touches[0].clientY;
-    isDraggingAccountSheet = true;
-    accountSheetEl.style.transition = 'none';
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDraggingAccountSheet) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - accountSheetStartY;
-    if (diffY > 0) {
-      accountSheetEl.style.transform = `translateY(${diffY}px)`;
-    }
-  }, { passive: true });
-
-  window.addEventListener('touchend', (e) => {
-    if (!isDraggingAccountSheet) return;
-    isDraggingAccountSheet = false;
-    const currentY = e.changedTouches[0].clientY;
-    const diffY = currentY - accountSheetStartY;
-
-    if (diffY > 80) {
-      closeAccountSheet();
-    } else {
-      accountSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
-      accountSheetEl.style.transform = 'translateY(0)';
-    }
+  setupSheetGestures({
+    sheetEl: accountSheetEl,
+    handleWrapperEl: accountHandleWrapperEl,
+    headerEl: accountSheetEl.querySelector('.sheet-header'),
+    backdropEl: accountBackdropEl,
+    onClose: closeAccountSheet
   });
 }
 
 
 // --- 8. Нативная шторка (Modal Sheet) с Drag-to-dismiss ---
-let sheetStartY = 0;
-let isDraggingSheet = false;
 
 function setSheetType(type) {
   state.sheetType = type;
@@ -1154,33 +1288,13 @@ function hideActionToast() {
 }
 
 function initSheetDrag() {
-  sheetHandleWrapperEl.addEventListener('touchstart', (e) => {
-    sheetStartY = e.touches[0].clientY;
-    isDraggingSheet = true;
-    bottomSheetEl.style.transition = 'none';
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDraggingSheet) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - sheetStartY;
-    if (diffY > 0) {
-      bottomSheetEl.style.transform = `translateY(${diffY}px)`;
-    }
-  }, { passive: true });
-
-  window.addEventListener('touchend', (e) => {
-    if (!isDraggingSheet) return;
-    isDraggingSheet = false;
-    const currentY = e.changedTouches[0].clientY;
-    const diffY = currentY - sheetStartY;
-
-    if (diffY > 80) {
-      closeBottomSheet();
-    } else {
-      bottomSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
-      bottomSheetEl.style.transform = 'translateY(0)';
-    }
+  if (!sheetHandleWrapperEl || !bottomSheetEl) return;
+  setupSheetGestures({
+    sheetEl: bottomSheetEl,
+    handleWrapperEl: sheetHandleWrapperEl,
+    headerEl: bottomSheetEl.querySelector('.sheet-header-segmented'),
+    backdropEl: sheetBackdropEl,
+    onClose: closeBottomSheet
   });
 }
 
@@ -1280,37 +1394,13 @@ function renderAnalytics() {
 }
 
 function initAnalyticsDrag() {
-  if (!analyticsHandleWrapperEl) return;
-  let startY = 0;
-  let isDragging = false;
-
-  analyticsHandleWrapperEl.addEventListener('touchstart', (e) => {
-    startY = e.touches[0].clientY;
-    isDragging = true;
-    analyticsSheetEl.style.transition = 'none';
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - startY;
-    if (diffY > 0) {
-      analyticsSheetEl.style.transform = `translateY(${diffY}px)`;
-    }
-  }, { passive: true });
-
-  window.addEventListener('touchend', (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    const currentY = e.changedTouches[0].clientY;
-    const diffY = currentY - startY;
-
-    if (diffY > 80) {
-      closeAnalyticsSheet();
-    } else {
-      analyticsSheetEl.style.transition = 'transform 0.25s var(--ios-spring)';
-      analyticsSheetEl.style.transform = 'translateY(0)';
-    }
+  if (!analyticsHandleWrapperEl || !analyticsSheetEl) return;
+  setupSheetGestures({
+    sheetEl: analyticsSheetEl,
+    handleWrapperEl: analyticsHandleWrapperEl,
+    headerEl: analyticsSheetEl.querySelector('.sheet-header'),
+    backdropEl: analyticsBackdropEl,
+    onClose: closeAnalyticsSheet
   });
 }
 
@@ -1457,6 +1547,9 @@ function setupEventListeners() {
   // Модалка аналитики
   if (analyticsCloseBtnEl) {
     analyticsCloseBtnEl.addEventListener('click', closeAnalyticsSheet);
+  }
+  if (analyticsBackdropEl) {
+    analyticsBackdropEl.addEventListener('click', closeAnalyticsSheet);
   }
   // Открытие модалки выбора категории
   if (selectedCategoryBtnEl) {
@@ -1974,6 +2067,9 @@ function init() {
       openHeaderMenu();
     }
   }
+
+  // Активация нативных :active состояний в iOS Safari
+  document.addEventListener('touchstart', () => {}, { passive: true });
 }
 
 document.addEventListener('DOMContentLoaded', init);

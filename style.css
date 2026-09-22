@@ -82,6 +82,22 @@ body {
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+/* Fast tap response & eliminate double-tap delay on mobile */
+button,
+input,
+select,
+textarea,
+a,
+.calc-key,
+.tx-item,
+.cat-chip,
+.ios-segment,
+.sheet-handle-wrapper,
+.fab-btn {
+  touch-action: manipulation;
 }
 
 /* Tabular figures for numbers */
@@ -1232,6 +1248,8 @@ body {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 30;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: opacity 0.26s var(--ios-ease);
 }
 
@@ -1267,21 +1285,38 @@ body {
   to { transform: translateY(0); }
 }
 
-/* Drag Handle with generous touch area */
+/* Drag Handle with generous touch area (minimum 32px height) */
 .sheet-handle-wrapper {
+  position: relative;
   width: 100%;
-  padding: 4px 0 8px 0;
+  padding: 8px 0 10px 0;
+  min-height: 28px;
   display: flex;
   justify-content: center;
+  align-items: center;
   cursor: grab;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sheet-handle-wrapper:active {
+  cursor: grabbing;
 }
 
 .sheet-handle {
   width: 38px;
   height: 5px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.35);
   border-radius: 9999px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+
+.sheet-handle-wrapper:active .sheet-handle {
+  background-color: rgba(255, 255, 255, 0.65);
+  transform: scaleX(1.1);
 }
 
 .sheet-header {
@@ -1289,6 +1324,9 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Centered Header for Add Sheet with Segmented Switcher & Top-Right Close Button */
@@ -1300,6 +1338,9 @@ body {
   min-height: 44px;
   margin-bottom: 10px;
   width: 100%;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .sheet-header-segmented .sheet-close-btn {
