@@ -713,6 +713,10 @@ body {
   user-select: none;
 }
 
+.cat-breakdown-row:last-child {
+  border-bottom: none;
+}
+
 .cat-breakdown-row:hover {
   background-color: rgba(255, 255, 255, 0.04);
 }
