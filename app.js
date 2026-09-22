@@ -815,11 +815,11 @@ function renderApp() {
   if (state.isPrivate) {
     balanceValueEl.textContent = '•••••• ₽';
     totalSpentBadgeEl.textContent = '•••••• ₽';
-    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = '~ ••• ₽';
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = '•••••• ₽';
   } else {
     balanceValueEl.textContent = formatRub(state.balance);
     totalSpentBadgeEl.textContent = formatRub(displaySpent);
-    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = `~ ${formatRub(dailyAvg)}`;
+    if (dailyAvgAmountEl) dailyAvgAmountEl.textContent = formatRub(dailyAvg);
   }
   renderPrivacyIcon();
 
@@ -1337,6 +1337,14 @@ function setupEventListeners() {
   // Кнопка аналитики на карточке баланса
   if (quickAnalyticsBtnEl) {
     quickAnalyticsBtnEl.addEventListener('click', () => {
+      openAnalyticsSheet();
+    });
+  }
+
+  // Клик по шапке структуры расходов со стрелкой открывает аналитику
+  const expenseStructureTriggerEl = document.getElementById('expense-structure-trigger');
+  if (expenseStructureTriggerEl) {
+    expenseStructureTriggerEl.addEventListener('click', () => {
       openAnalyticsSheet();
     });
   }

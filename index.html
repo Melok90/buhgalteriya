@@ -111,64 +111,55 @@
     <!-- Main Scrollable Content -->
     <main class="main-scroll-area">
 
-      <!-- Unified Finance Hub Card (Apple Minimalist Executive Compact Card) -->
-      <section id="finance-hub-card" class="finance-hub-card">
-        <!-- Top Row: Balance & Actions -->
-        <div class="hub-balance-row">
-          <div class="hub-balance-col">
-            <div class="balance-amount-wrapper" id="balance-amount-trigger" role="button" tabindex="0" title="Нажмите, чтобы скрыть или показать баланс">
-              <span id="balance-value" class="balance-value num-tabular">45 716 ₽</span>
-            </div>
+      <!-- Card 1: Balance Card (Apple Minimalist Executive) -->
+      <section id="balance-card" class="balance-card">
+        <div class="balance-card-top-row">
+          <div class="balance-amount-wrapper" id="balance-amount-trigger" role="button" tabindex="0" title="Нажмите, чтобы скрыть или показать баланс">
+            <span id="balance-value" class="balance-value num-tabular">45 716 ₽</span>
           </div>
-          <div class="hub-header-actions">
-            <button id="account-settings-btn" class="hub-action-pill" type="button" aria-label="Настроить счет и баланс" title="Настроить счет и баланс">
-              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <div class="balance-header-actions">
+            <button id="account-settings-btn" class="balance-btn-icon" type="button" aria-label="Настроить счет и баланс" title="Настроить счет и баланс">
+              <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
               </svg>
-              <span>Счёт</span>
             </button>
-            <button id="quick-analytics-btn" class="hub-action-pill" type="button" aria-label="Аналитика расходов" title="Аналитика расходов">
+            <button id="quick-analytics-btn" class="balance-btn-pill" type="button" aria-label="Аналитика расходов" title="Аналитика расходов">
               <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
               </svg>
               <span>Аналитика</span>
             </button>
             <!-- Hidden compatibility button for privacy toggle script -->
-            <button id="privacy-toggle-btn" class="privacy-toggle-btn hidden" aria-label="Скрыть или показать баланс" style="display: none;">
-              <svg id="privacy-icon" width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-            </button>
+            <button id="privacy-toggle-btn" class="privacy-toggle-btn hidden" aria-label="Скрыть или показать баланс" style="display: none;"></button>
           </div>
         </div>
 
-        <!-- Second Row: Monthly Spent & Daily Average Strip -->
-        <div class="hub-context-row">
-          <div class="hub-context-col hub-context-left">
-            <div class="hub-period-selector" id="hub-period-trigger">
-              <span class="hub-context-label" id="spending-period-label">Сентябрь</span>
-              <svg class="hub-chevron-down" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
-              </svg>
-            </div>
-            <div class="hub-context-subrow">
-              <span class="hub-context-value num-tabular" id="total-spent-amount">0 ₽</span>
-              <span class="hub-context-suffix">расходы</span>
-            </div>
+        <!-- Sub-row: spent and daily avg matching reference -->
+        <div class="balance-sub-row">
+          <div class="balance-sub-col balance-sub-left">
+            <span class="balance-sub-num num-tabular" id="total-spent-amount">0 ₽</span>
+            <span class="balance-sub-label" id="spending-period-label">Сентябрь</span>
           </div>
-          <div class="hub-context-divider"></div>
-          <div class="hub-context-col hub-context-right">
-            <span class="hub-context-value num-tabular" id="daily-avg-amount">~ 0 ₽</span>
-            <span class="hub-context-label">в день</span>
+          <div class="balance-sub-col balance-sub-right">
+            <span class="balance-sub-num num-tabular" id="daily-avg-amount">0 ₽</span>
+            <span class="balance-sub-label">в день</span>
           </div>
         </div>
+      </section>
 
-        <!-- Third Row: Multi-segment Stacked Bar -->
+      <!-- Card 2: Expense Structure Card -->
+      <section id="expense-structure-card" class="expense-structure-card">
+        <div class="expense-structure-header" id="expense-structure-trigger" role="button" tabindex="0" title="Открыть аналитику расходов">
+          <h2 class="expense-structure-title">Структура расходов</h2>
+          <div class="expense-structure-chevron" aria-hidden="true">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
         <div id="expense-stacked-bar" class="expense-stacked-bar" role="progressbar" aria-label="Структура расходов по категориям">
           <!-- Rendered dynamically by JavaScript -->
         </div>
-
-        <!-- Fourth Row: Categories Breakdown (Top 4 Rows + 2-Col Bottom Split) -->
         <div id="expense-categories-grid" class="expense-categories-breakdown">
           <!-- Rendered dynamically by JavaScript -->
         </div>
