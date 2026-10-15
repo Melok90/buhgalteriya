@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#242424">
   
   <title>Приложение Бухгалтерия</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
@@ -13,10 +13,10 @@
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Google Fonts: Montserrat (for clean Cyrillic display) -->
+  <!-- Google Fonts: Golos Text & Onest (Modern Russian Cyrillic & Fintech Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Apple HIG Stylesheet -->
   <link rel="stylesheet" href="style.css">
@@ -30,7 +30,7 @@
     <header class="app-header">
       <div class="top-bar">
         <div>
-          <span class="subtitle-badge">Персональный учет</span>
+          <span class="subtitle-badge">Персональный учёт</span>
           <h1 class="app-title">Бухгалтерия</h1>
         </div>
         <!-- Top-Right 3-Dots Menu (Local Backup & Actions) -->
@@ -56,14 +56,14 @@
               <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
               </svg>
-              <span>Сохранить в файл</span>
+              <span>Сохранить в&nbsp;файл</span>
             </button>
 
             <button type="button" id="menu-restore-btn" class="menu-item" role="menuitem">
               <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
               </svg>
-              <span>Загрузить из файла</span>
+              <span>Загрузить из&nbsp;файла</span>
             </button>
 
             <div class="menu-divider"></div>
@@ -118,7 +118,7 @@
             <span id="balance-value" class="balance-value num-tabular">45 716 ₽</span>
           </div>
           <div class="balance-header-actions">
-            <button id="account-settings-btn" class="balance-btn-icon" type="button" aria-label="Настроить счет и баланс" title="Настроить счет и баланс">
+            <button id="account-settings-btn" class="balance-btn-icon" type="button" aria-label="Настроить счёт и баланс" title="Настроить счёт и баланс">
               <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
               </svg>
@@ -142,7 +142,7 @@
           </div>
           <div class="balance-sub-col balance-sub-right">
             <span class="balance-sub-num num-tabular" id="daily-avg-amount">0 ₽</span>
-            <span class="balance-sub-label">в день</span>
+            <span class="balance-sub-label">в&nbsp;день</span>
           </div>
         </div>
       </section>
@@ -259,7 +259,7 @@
         <!-- Selected Category Card (Interactive row replacing crypto row) -->
         <button type="button" id="selected-category-btn" class="selected-category-card" aria-label="Выбрать категорию" aria-haspopup="dialog">
           <div class="selected-cat-left">
-            <div id="selected-cat-icon-badge" class="selected-cat-icon-badge" style="--cat-bg: #30d158;">
+            <div id="selected-cat-icon-badge" class="selected-cat-icon-badge" style="--cat-bg: #62B982;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
@@ -352,7 +352,7 @@
       <div class="account-sheet-content">
         <!-- Balance Input Card -->
         <div class="account-card-section">
-          <label for="account-balance-input" class="account-section-label">Баланс счета</label>
+          <label for="account-balance-input" class="account-section-label">Баланс счёта</label>
           <div class="account-balance-input-wrap">
             <input 
               type="text" 
@@ -378,7 +378,7 @@
         <div class="account-card-section">
           <label class="account-option-row" for="account-clear-txs-toggle">
             <div class="account-option-text">
-              <span class="account-option-title">Начать с чистого листа</span>
+              <span class="account-option-title">Начать с&nbsp;чистого листа</span>
               <span class="account-option-desc">Очистить демо-операции для ввода только своих данных</span>
             </div>
             <div class="ios-switch-container">

@@ -10,61 +10,61 @@ const CATEGORIES = [
   { 
     id: 'all', 
     name: 'Все', 
-    hex: '#ffffff',
+    hex: '#E8E8E8',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`
   },
   { 
     id: 'food', 
     name: 'Еда', 
-    hex: '#bf5af2', 
+    hex: '#62B982', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`
   }, 
   { 
     id: 'transport', 
     name: 'Транспорт', 
-    hex: '#ffd60a', 
+    hex: '#FFB34D', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>`
   }, 
   { 
     id: 'shopping', 
     name: 'Покупки', 
-    hex: '#ff453a', 
+    hex: '#FF7275', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`
   }, 
   { 
     id: 'home', 
     name: 'Дом', 
-    hex: '#64d2ff', 
+    hex: '#69C8F2', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
   }, 
   { 
     id: 'health', 
     name: 'Здоровье', 
-    hex: '#30d158', 
+    hex: '#6E72F5', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
   }, 
   { 
     id: 'sport', 
     name: 'Спорт', 
-    hex: '#32ade6', 
+    hex: '#69C8F2', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1Z"/><path d="M22 4v16a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1Z"/><path d="M6 12h12"/><path d="M6 8h2v8H6z"/><path d="M16 8h2v8h-2z"/></svg>`
   }, 
   { 
     id: 'coffee', 
     name: 'Кафе', 
-    hex: '#ff9f0a', 
+    hex: '#FFB34D', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`
   },
   { 
     id: 'entertainment', 
     name: 'Развлечения', 
-    hex: '#ff375f', 
+    hex: '#FF7275', 
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`
   },
   {
     id: 'other',
     name: 'Другое',
-    hex: '#8e8e93',
+    hex: '#969696',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>`
   }
 ];
@@ -73,49 +73,49 @@ const INCOME_CATEGORIES = [
   {
     id: 'salary',
     name: 'Зарплата',
-    hex: '#30d158',
+    hex: '#C7FF4A',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`
   },
   {
     id: 'transfer',
     name: 'Перевод',
-    hex: '#0a84ff',
+    hex: '#69C8F2',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`
   },
   {
     id: 'cashback',
     name: 'Кэшбэк',
-    hex: '#ffd60a',
+    hex: '#FFB34D',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`
   },
   {
     id: 'invest',
     name: 'Инвест',
-    hex: '#bf5af2',
+    hex: '#6E72F5',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`
   },
   {
     id: 'business',
     name: 'Бизнес',
-    hex: '#64d2ff',
+    hex: '#C7FF4A',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`
   },
   {
     id: 'gift',
     name: 'Подарок',
-    hex: '#ff375f',
+    hex: '#6E72F5',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect width="20" height="5" x="2" y="7"/><line x1="12" x2="12" y1="22" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`
   },
   {
     id: 'freelance',
     name: 'Фриланс',
-    hex: '#ff9f0a',
+    hex: '#FFB34D',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><line x1="2" x2="22" y1="20" y2="20"/></svg>`
   },
   {
     id: 'income_other',
     name: 'Другое',
-    hex: '#8e8e93',
+    hex: '#969696',
     icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>`
   }
 ];
@@ -323,7 +323,7 @@ const analyticsBodyEl = document.getElementById('analytics-body');
 
 // --- 5. Вспомогательные функции форматирования ---
 function formatRub(num) {
-  return `${Math.round(num).toLocaleString('ru-RU')} ₽`;
+  return `${Math.round(num).toLocaleString('ru-RU')}\u00A0₽`;
 }
 
 function getNounPlural(number, one, two, five) {
@@ -758,8 +758,17 @@ function getDateKey(dateInput) {
   return `${year}-${month}-${day}`;
 }
 
-function formatGroupDateTitle(dateKey) {
-  if (dateKey === 'unknown') return 'Ранее';
+function hexToRgb(hex) {
+  if (!hex || hex[0] !== '#') return '150, 150, 150';
+  let c = hex.slice(1);
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  const num = parseInt(c, 16);
+  if (isNaN(num)) return '150, 150, 150';
+  return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
+function formatGroupDateDetails(dateKey) {
+  if (dateKey === 'unknown') return { title: 'Ранее', weekday: '' };
   const [y, m, d] = dateKey.split('-').map(Number);
   const txDate = new Date(y, m - 1, d);
   
@@ -767,14 +776,26 @@ function formatGroupDateTitle(dateKey) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const diffDays = Math.round((today - txDate) / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'Сегодня';
-  if (diffDays === 1) return 'Вчера';
+  const weekdayShort = txDate.toLocaleDateString('ru-RU', { weekday: 'short' });
+  const dayMonth = txDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
-  const options = { day: 'numeric', month: 'long' };
-  if (y !== now.getFullYear()) {
-    options.year = 'numeric';
+  if (diffDays === 0) {
+    return { title: 'Сегодня', weekday: `${dayMonth}, ${weekdayShort}` };
   }
-  return txDate.toLocaleDateString('ru-RU', options);
+  if (diffDays === 1) {
+    return { title: 'Вчера', weekday: `${dayMonth}, ${weekdayShort}` };
+  }
+
+  const weekdayFull = txDate.toLocaleDateString('ru-RU', { weekday: 'long' });
+  let title = dayMonth;
+  if (y !== now.getFullYear()) {
+    title += ` ${y}`;
+  }
+  return { title, weekday: weekdayFull };
+}
+
+function formatGroupDateTitle(dateKey) {
+  return formatGroupDateDetails(dateKey).title;
 }
 
 function groupTransactionsByDate(txList) {
@@ -783,16 +804,21 @@ function groupTransactionsByDate(txList) {
   txList.forEach(tx => {
     const key = getDateKey(tx.date);
     if (!groups.has(key)) {
+      const dateInfo = formatGroupDateDetails(key);
       groups.set(key, {
         dateKey: key,
-        title: formatGroupDateTitle(key),
+        title: dateInfo.title,
+        weekday: dateInfo.weekday,
         total: 0,
+        incomeTotal: 0,
         items: []
       });
     }
     const group = groups.get(key);
     group.items.push(tx);
-    if (tx.type !== 'income') {
+    if (tx.type === 'income') {
+      group.incomeTotal += Number(tx.amount) || 0;
+    } else {
       group.total += Number(tx.amount) || 0;
     }
   });
@@ -800,7 +826,7 @@ function groupTransactionsByDate(txList) {
   return Array.from(groups.values()).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
 }
 
-// --- 5.2 Расчет и рендеринг блока «Структура расходов» ---
+// --- 5.2 Расчёт и рендеринг блока «Структура расходов» ---
 function renderExpenseStructure() {
   if (!expenseStackedBarEl || !expenseCategoriesGridEl) return;
 
@@ -1013,54 +1039,100 @@ function renderApp() {
         const cat = isIncome
           ? (INCOME_CATEGORIES.find(c => c.id === tx.categoryId) || INCOME_CATEGORIES[0])
           : (CATEGORIES.find(c => c.id === tx.categoryId) || CATEGORIES[1]);
-        const metaParts = [];
-        if (tx.place) metaParts.push(escapeHtml(tx.place));
-        const catName = cat ? cat.name : (isIncome ? 'Пополнение' : '');
-        if (catName && cat.id !== 'all') {
-          if (tx.comment !== catName || tx.place) {
-            metaParts.push(catName);
+        
+        const catColor = cat ? (cat.hex || '#969696') : (isIncome ? '#C7FF4A' : '#969696');
+        const catRgb = hexToRgb(catColor);
+
+        // Meaningful title & subtitle
+        const rawComment = (tx.comment || '').trim();
+        const catName = cat ? cat.name : (isIncome ? 'Пополнение' : 'Расход');
+        
+        let title = rawComment;
+        let subParts = [];
+
+        if (!title || title.toLowerCase() === 'расход' || title.toLowerCase() === 'пополнение') {
+          title = tx.place || catName;
+          if (tx.place && catName && catName !== 'Все' && catName !== title) {
+            subParts.push(catName);
+          }
+        } else {
+          // If title is a custom comment, show category in subtitle
+          if (catName && catName !== 'Все') {
+            subParts.push(catName);
+          }
+          if (tx.place && tx.place !== rawComment) {
+            subParts.push(tx.place);
           }
         }
-        const subtitle = metaParts.join(' · ');
 
-        const catColor = cat ? (cat.hex || '#8e8e93') : (isIncome ? '#30d158' : '#8e8e93');
-        const incomeDefaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>`;
+        // Add formatted time if available
+        if (tx.date) {
+          const d = new Date(tx.date);
+          if (!isNaN(d.getTime())) {
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            if (hours !== '00' || minutes !== '00') {
+              subParts.push(`${hours}:${minutes}`);
+            }
+          }
+        }
+
+        const subtitle = subParts.map(escapeHtml).join(' · ');
+
+        const incomeDefaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16m8-8H4"/></svg>`;
         const iconSvg = cat ? cat.icon : (isIncome ? incomeDefaultIcon : CATEGORIES[1].icon);
-        const amountDisplay = isIncome ? `+${formatRub(tx.amount)}` : formatRub(tx.amount);
-        const amountClass = isIncome ? 'tx-amount num-tabular is-income' : 'tx-amount num-tabular';
+        const amountDisplay = isIncome ? `+${formatRub(tx.amount)}` : `−${formatRub(tx.amount)}`;
+        const amountClass = isIncome ? 'tx-amount is-income num-tabular' : 'tx-amount is-expense num-tabular';
 
         return `
-          <div class="tx-item" data-tx-row="${tx.id}" role="button" tabindex="0" aria-label="${escapeHtml(tx.comment)}, ${amountDisplay}">
-            <div class="tx-icon-badge" style="--cat-color: ${catColor};">
+          <div class="tx-item" data-tx-row="${tx.id}" role="button" tabindex="0" aria-label="${escapeHtml(title)}, ${amountDisplay}">
+            <div class="tx-icon-badge" style="--cat-color: ${catColor}; --cat-rgb: ${catRgb};">
               ${iconSvg}
             </div>
             
             <div class="tx-info">
-              <span class="tx-title">${escapeHtml(tx.comment)}</span>
-              ${subtitle ? `<span class="tx-subtitle">${subtitle}</span>` : ''}
+              <span class="tx-title">${escapeHtml(title)}</span>
+              <div class="tx-meta">
+                <span class="tx-cat-dot" style="--cat-color: ${catColor};"></span>
+                <span class="tx-subtitle">${subtitle || escapeHtml(catName)}</span>
+              </div>
             </div>
 
             <div class="tx-amount-col">
               <span class="${amountClass}">${amountDisplay}</span>
             </div>
-
-            <div class="tx-chevron-indicator" aria-hidden="true">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
           </div>
         `;
       }).join('');
 
+      // Day total badge
+      let totalBadgeHtml = '';
+      if (group.total > 0 && group.incomeTotal === 0) {
+        totalBadgeHtml = `<span class="date-group-total-badge num-tabular">−${formatRub(group.total)}</span>`;
+      } else if (group.incomeTotal > 0 && group.total === 0) {
+        totalBadgeHtml = `<span class="date-group-total-badge is-income num-tabular">+${formatRub(group.incomeTotal)}</span>`;
+      } else {
+        const net = group.incomeTotal - group.total;
+        if (net >= 0) {
+          totalBadgeHtml = `<span class="date-group-total-badge is-income num-tabular">+${formatRub(net)} итог</span>`;
+        } else {
+          totalBadgeHtml = `<span class="date-group-total-badge num-tabular">−${formatRub(Math.abs(net))}</span>`;
+        }
+      }
+
       return `
         <section class="date-group-section" aria-label="${group.title}">
-          <div class="date-group-header">
-            <span class="date-group-title">${group.title}</span>
-            <span class="date-group-total num-tabular">−${formatRub(group.total)}</span>
-          </div>
           <div class="date-group-card">
-            ${itemsHtml}
+            <div class="date-group-header">
+              <div class="date-group-title-wrap">
+                <span class="date-group-title">${group.title}</span>
+                ${group.weekday ? `<span class="date-group-weekday">${group.weekday}</span>` : ''}
+              </div>
+              ${totalBadgeHtml}
+            </div>
+            <div class="date-group-items-list">
+              ${itemsHtml}
+            </div>
           </div>
         </section>
       `;
@@ -1352,26 +1424,26 @@ function renderAnalytics() {
 
   const sortedCats = Object.entries(catMap)
     .map(([cId, amount]) => {
-      const catObj = CATEGORIES.find(c => c.id === cId) || { name: 'Другое', icon: '•' };
+      const catObj = CATEGORIES.find(c => c.id === cId) || { name: 'Другое', icon: '•', hex: '#6A6A6A' };
       const pct = total > 0 ? Math.round((amount / total) * 100) : 0;
-      return { id: cId, name: catObj.name, icon: catObj.icon, amount, pct };
+      return { id: cId, name: catObj.name, icon: catObj.icon, hex: catObj.hex, amount, pct };
     })
     .sort((a, b) => b.amount - a.amount);
 
   analyticsBodyEl.innerHTML = `
     <div class="analytics-stat-grid">
       <div class="analytics-stat-card">
-        <span class="analytics-stat-label">Траты в ${monthName.toLowerCase()}е</span>
+        <span class="analytics-stat-label">Траты в&nbsp;${monthName.toLowerCase()}е</span>
         <span class="analytics-stat-val num-tabular">${formatRub(total)}</span>
       </div>
       <div class="analytics-stat-card">
-        <span class="analytics-stat-label">В день в среднем</span>
+        <span class="analytics-stat-label">В&nbsp;день в&nbsp;среднем</span>
         <span class="analytics-stat-val num-tabular">${formatRub(avgDay)}</span>
       </div>
     </div>
 
     <div>
-      <div class="analytics-section-title">Распределение по категориям</div>
+      <div class="analytics-section-title">Распределение по&nbsp;категориям</div>
       <div class="analytics-categories-list">
         ${sortedCats.length === 0 ? '<p style="color: var(--ios-label-secondary); font-size: 13px;">Нет расходов за этот период</p>' : sortedCats.map(cat => `
           <div class="analytics-cat-item">
@@ -1384,7 +1456,7 @@ function renderAnalytics() {
               <span class="analytics-cat-amount num-tabular">${formatRub(cat.amount)}</span>
             </div>
             <div class="analytics-cat-bar-bg">
-              <div class="analytics-cat-bar-fill" style="width: ${cat.pct}%;"></div>
+              <div class="analytics-cat-bar-fill" style="width: ${cat.pct}%; background-color: ${cat.hex || 'var(--accent-lime)'};"></div>
             </div>
           </div>
         `).join('')}
@@ -1868,10 +1940,10 @@ function setupEventListeners() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        showActionToast('Прогресс сохранен в файл');
+        showActionToast('Прогресс сохранён в\u00A0файл');
       } catch (err) {
         console.error('Ошибка создания файла бэкапа', err);
-        showActionToast('Прогресс сохранен локально');
+        showActionToast('Прогресс сохранён локально');
       }
     });
   }
@@ -1912,7 +1984,7 @@ function setupEventListeners() {
           showActionToast(`Восстановлено ${parsed.transactions.length} операций`);
         } catch (err) {
           triggerHaptic('error');
-          alert('Ошибка чтения файла: выберите корректный JSON-файл резервной копии.');
+          alert('Ошибка чтения файла: выберите корректный JSON-файл резервной копии');
         }
       };
       reader.readAsText(file);
@@ -2000,7 +2072,7 @@ function setupEventListeners() {
       if (shouldClearTxs) {
         showActionToast(`Счёт настроен: ${formatRub(cleanNum)} (операции очищены)`);
       } else {
-        showActionToast(`Баланс обновлен: ${formatRub(cleanNum)}`);
+        showActionToast(`Баланс обновлён: ${formatRub(cleanNum)}`);
       }
     });
   }
